@@ -6,8 +6,9 @@ import Link from 'next/link';
 
 export default function AdminLogin() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@alya.it');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('alya.condividere@gmail.com');
+  const [password, setPassword] = useState('alya123!');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -82,14 +83,23 @@ export default function AdminLogin() {
               <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-                placeholder="Inserisci la password"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black pr-12"
+                  placeholder="Inserisci la password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition"
+                >
+                  <i className={`mdi ${showPassword ? 'mdi-eye-off' : 'mdi-eye'} text-xl`} />
+                </button>
+              </div>
             </div>
 
             <button
@@ -100,13 +110,6 @@ export default function AdminLogin() {
               {loading ? 'Accesso in corso...' : 'Accedi'}
             </button>
           </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-center text-sm text-black">
-              Credenziali di prova:<br />
-              <span className="font-mono text-xs text-gray-700">admin@alya.it / admin123</span>
-            </p>
-          </div>
 
           <Link href="/" className="block text-center text-sm text-black hover:text-gray-700 mt-10 underline">
             Torna alla home

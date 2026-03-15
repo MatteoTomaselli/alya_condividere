@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/dateFormatter';
 
@@ -41,6 +42,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [editingBooking, setEditingBooking] = useState<number | null>(null);
   const [editingPeople, setEditingPeople] = useState<Person[]>([]);
+  const [eventPhotos, setEventPhotos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const adminEmail = localStorage.getItem('admin_email');
@@ -144,6 +147,66 @@ export default function AdminDashboard() {
     : bookings;
 
   const selectedEventInfo = events.find(e => e.id === selectedEvent);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      loadEventPhotos();
+    }
+  }, [selectedEvent]);
+
+  const loadEventPhotos = async () => {
+    try {
+      const response = await fetch(`/api/photos?event_id=${selectedEvent}`);
+      if (response.ok) {
+        const data = await response.json();
+        setEventPhotos(data.photos || []);
+      }
+    } catch (error) {
+      console.error('Errore caricamento foto:', error);
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.currentTarget.files;
+    if (!files || !selectedEvent) return;
+
+    setUploading(true);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const formData = new FormData();
+        formData.append('file', files[i]);
+        formData.append('event_id', selectedEvent.toString());
+
+        const response = await fetch('/api/photos', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setEventPhotos(prev => [...prev, data.url]);
+        }
+      }
+    } catch (error) {
+      console.error('Errore caricamento foto:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeletePhoto = async (index: number) => {
+    const photoUrl = eventPhotos[index];
+    try {
+      await fetch('/api/photos', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: photoUrl })
+      });
+      setEventPhotos(prev => prev.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error('Errore eliminazione foto:', error);
+    }
+  };
 
   if (!isAuthorized) {
     return <div className="min-h-screen flex items-center justify-center">Verifica autorizzazione...</div>;
@@ -442,15 +505,15 @@ export default function AdminDashboard() {
                                 <>
                                   <button
                                     onClick={() => handleEditBooking(booking)}
-                                    className="text-blue-600 hover:text-blue-800 font-semibold"
+                                    className="text-blue-600 hover:text-blue-800"
                                   >
-                                    Modifica
+                                    <i className="mdi mdi-pencil text-xl" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteBooking(booking.id)}
-                                    className="text-red-600 hover:text-red-800 font-semibold"
+                                    className="text-red-600 hover:text-red-800"
                                   >
-                                    Elimina
+                                    <i className="mdi mdi-delete text-xl" />
                                   </button>
                                 </>
                               )}
@@ -466,6 +529,141 @@ export default function AdminDashboard() {
           </div>
         )}
       </main>
+
+      {/* Sezione Foto */}
+      {selectedEventInfo && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-black">
+                Foto Evento - {selectedEventInfo.title}
+              </h2>
+            </div>
+
+            <div className="p-6">
+              {/* Caricamento Foto */}
+              <div className="mb-8">
+                <label className="block text-sm font-medium text-black mb-4">
+                  Carica foto dell'evento
+                </label>
+                <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center hover:bg-pink-50 transition cursor-pointer">
+                  <input
+                    type="file"
+                    id="photo-upload"
+                    multiple
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="photo-upload"
+                    className="cursor-pointer block"
+                  >
+                    <i className="mdi mdi-cloud-upload text-4xl text-pink-400 mb-2" />
+                    <p className="text-gray-600 font-medium">
+                      {uploading ? 'Caricamento in corso...' : 'Clicca per selezionare le foto o trascinale qui'}
+                    </p>
+                    <p className="text-gray-500 text-sm mt-1">PNG, JPG, GIF fino a 10MB</p>
+                  </label>
+                </div>
+              </div>
+
+              {/* Galleria Foto */}
+              {eventPhotos.length > 0 ? (
+                <div>
+                  <h3 className="text-lg font-semibold text-black mb-4">Foto caricate ({eventPhotos.length})</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {eventPhotos.map((photo, index) => (
+                      <div key={index} className="relative group rounded-lg overflow-hidden shadow-md">
+                        <img
+                          src={photo}
+                          alt={`Foto ${index + 1}`}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition">
+                          <a
+                            href={photo}
+                            download={`foto-${index + 1}`}
+                            className="text-white hover:text-amber-400 transition"
+                          >
+                            <i className="mdi mdi-download text-3xl" />
+                          </a>
+                          <button
+                            onClick={() => handleDeletePhoto(index)}
+                            className="text-white hover:text-red-400 transition"
+                          >
+                            <i className="mdi mdi-delete text-3xl" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-8">
+                  Nessuna foto caricata ancora
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex justify-between items-start">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1">
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Alya</h4>
+                <p className="text-gray-400 text-sm">
+                  Spazio creativo e di benessere per donne e ragazze. Un progetto di Giorgia e Valeria.
+                </p>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Link Utili</h4>
+                <ul className="space-y-2 text-gray-400">
+                  <li>
+                    <Link href="/" className="hover:text-amber-400 transition">
+                      Home
+                    </Link>
+                  </li>
+                  <li><Link href="/about" className="hover:text-amber-400 transition">Chi Siamo</Link></li>
+                  <li><Link href="/admin" className="hover:text-amber-400 transition">Area Admin</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Contatti</h4>
+                <div className="flex gap-3 mb-4">
+                  <a href="https://www.instagram.com/alya.condividere" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-amber-400 transition">
+                    <i className="mdi mdi-instagram text-2xl" />
+                  </a>
+                  <a href="https://www.facebook.com/share/1HNSQR6Leb/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-amber-400 transition">
+                    <i className="mdi mdi-facebook text-2xl" />
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <i className="mdi mdi-email text-gray-400" />
+                  <p className="text-gray-400 text-sm">alya.condividere@gmail.com</p>
+                </div>
+              </div>
+            </div>
+            <div className="w-20 h-20 relative ml-8">
+              <Image 
+                src="/alya-logo.jpeg" 
+                alt="Alya Logo" 
+                width={80} 
+                height={80}
+                className="rounded-full"
+              />
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 flex justify-end">
+            <p className="text-gray-400 text-sm">© 2026 Alya - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

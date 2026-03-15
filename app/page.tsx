@@ -1,6 +1,7 @@
 'use client';
 
 import EventCarousel from '@/components/EventCarousel';
+import CascinaGallery from '@/components/CascinaGallery';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -159,12 +160,7 @@ export default function Home() {
         <div className="mb-16" id="collaborations">
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Con chi collaboriamo</h3>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-blue-900">
-              <h4 className="text-2xl font-bold text-black mb-4">🏞️ Cascina Argentera</h4>
-              <p className="text-gray-700">
-                Una location meravigliosa e accogliente nel cuore della Cascina, perfetta per i nostri eventi e attività. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.
-              </p>
-            </div>
+            <CascinaGallery />
           </div>
         </div>
       </main>

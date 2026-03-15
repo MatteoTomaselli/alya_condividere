@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { getAsync } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,13 +10,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email e password richieste' }, { status: 400 });
     }
 
-    const admin = await getAsync('SELECT * FROM admin WHERE email = ?', [email]);
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 
-    if (!admin) {
+    console.log('Email ricevuta:', email);
+    console.log('Email attesa:', adminEmail);
+    console.log('Hash da .env:', adminPasswordHash);
+    console.log('Password ricevuta:', password);
+
+    if (!adminEmail || !adminPasswordHash) {
+      return NextResponse.json({ error: 'Configurazione admin mancante' }, { status: 500 });
+    }
+
+    if (email !== adminEmail) {
       return NextResponse.json({ error: 'Credenziali non valide' }, { status: 401 });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, admin.password);
+    const isPasswordValid = bcrypt.compareSync(password, adminPasswordHash);
 
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Credenziali non valide' }, { status: 401 });
@@ -25,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      email: admin.email,
+      email: adminEmail,
       message: 'Login riuscito'
     });
   } catch (error) {
