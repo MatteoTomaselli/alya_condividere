@@ -8,20 +8,56 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // Helper per formattare i risultati come SQLite
 export async function runAsync(query: string, params: any[] = []) {
   try {
-    // Per INSERT, UPDATE, DELETE - usare direttamente i metodi Supabase
-    const { data, error } = await supabase.rpc('exec_query', { 
-      p_query: query, 
-      p_params: params 
-    }).catch(() => {
-      // Se RPC non disponibile, ritorna un placeholder
-      return { data: { id: Date.now() }, error: null };
-    });
-    
-    if (error) throw error;
-    return data || { id: Date.now() };
+    // Per INSERT INTO bookings
+    if (query.includes('INSERT INTO bookings')) {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert({
+          event_id: params[0],
+          people: params[1],
+          status: params[2] || 'confirmed'
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    }
+
+    // Per UPDATE bookings
+    if (query.includes('UPDATE bookings')) {
+      const id = params[0];
+      const updates = params[1] || {};
+      
+      const { data, error } = await supabase
+        .from('bookings')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    }
+
+    // Per DELETE bookings
+    if (query.includes('DELETE FROM bookings')) {
+      const id = params[0];
+      
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      return { success: true };
+    }
+
+    // Fallback per altre query
+    return { id: Date.now() };
   } catch (error) {
     console.error('Database error:', error);
-    return { id: Date.now() };
+    throw error;
   }
 }
 
