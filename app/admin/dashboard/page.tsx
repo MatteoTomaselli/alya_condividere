@@ -228,6 +228,33 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDownloadPhoto = async (photo: string, index: number) => {
+    try {
+      // Estrai il nome del file dall'URL
+      const urlParts = photo.split('/');
+      const filename = urlParts[urlParts.length - 1];
+      
+      // Fetcha il file
+      const response = await fetch(photo);
+      if (!response.ok) throw new Error('Errore download');
+      
+      const blob = await response.blob();
+      
+      // Crea un link e scarica
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Errore download foto:', error);
+      alert('Errore durante il download');
+    }
+  };
+
   if (!isAuthorized) {
     return <div className="min-h-screen flex items-center justify-center">Verifica autorizzazione...</div>;
   }
@@ -602,16 +629,17 @@ export default function AdminDashboard() {
                           className="w-full h-48 object-cover"
                         />
                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition">
-                          <a
-                            href={photo}
-                            download={`foto-${index + 1}`}
+                          <button
+                            onClick={() => handleDownloadPhoto(photo, index)}
                             className="text-white hover:text-amber-400 transition"
+                            title="Scarica foto"
                           >
                             <i className="mdi mdi-download text-3xl" />
-                          </a>
+                          </button>
                           <button
                             onClick={() => handleDeletePhoto(index)}
                             className="text-white hover:text-red-400 transition"
+                            title="Elimina foto"
                           >
                             <i className="mdi mdi-delete text-3xl" />
                           </button>
