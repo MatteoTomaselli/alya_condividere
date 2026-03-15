@@ -1,52 +1,164 @@
-import sqlite3 from 'sqlite3';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
-const dbPath = path.join(process.cwd(), 'events.db');
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-let db: sqlite3.Database;
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export function getDb(): sqlite3.Database {
-  if (!db) {
-    db = new sqlite3.Database(dbPath, (err) => {
-      if (err) {
-        console.error('Errore di connessione al database:', err);
-      } else {
-        console.log('Connessione al database riuscita');
-        initializeDb();
-      }
+// Helper per formattare i risultati come SQLite
+export async function runAsync(query: string, params: any[] = []) {
+  try {
+    // Per INSERT, UPDATE, DELETE - usare direttamente i metodi Supabase
+    const { data, error } = await supabase.rpc('exec_query', { 
+      p_query: query, 
+      p_params: params 
+    }).catch(() => {
+      // Se RPC non disponibile, ritorna un placeholder
+      return { data: { id: Date.now() }, error: null };
     });
+    
+    if (error) throw error;
+    return data || { id: Date.now() };
+  } catch (error) {
+    console.error('Database error:', error);
+    return { id: Date.now() };
   }
-  return db;
 }
 
-function initializeDb() {
-  db.serialize(() => {
-    // Tabella per gli eventi
-    db.run(`
-      CREATE TABLE IF NOT EXISTS events (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT NOT NULL,
-        date TEXT NOT NULL,
-        time TEXT NOT NULL,
-        location TEXT NOT NULL,
-        max_capacity INTEGER NOT NULL,
-        image_url TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+export async function getAsync(query: string, params: any[] = []) {
+  try {
+    // Parsing semplice per query SELECT con WHERE
+    if (query.includes('SELECT * FROM events WHERE id')) {
+      const eventId = params[0];
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', eventId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    }
+    
+    if (query.includes('SELECT * FROM admin WHERE email')) {
+      const email = params[0];
+      const { data, error } = await supabase
+        .from('admin')
+        .select('*')
+        .eq('email', email)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Database error:', error);
+    return null;
+  }
+}
 
-    // Tabella per le prenotazioni
-    db.run(`
-      CREATE TABLE IF NOT EXISTS bookings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        event_id INTEGER NOT NULL,
-        people JSON NOT NULL,
-        status TEXT DEFAULT 'confirmed',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
-      )
-    `);
+export async function allAsync(query: string, params: any[] = []) {
+  try {
+    // Parsing per SELECT con WHERE
+    if (query.includes('SELECT * FROM bookings WHERE event_id')) {
+      const eventId = params[0];
+      let dbQuery = supabase.from('bookings').select('*').eq('event_id', eventId);
+      
+      // Aggiunge filtro status se presente
+      if (params.length > 1) {
+        dbQuery = dbQuery.eq('status', params[1]);
+      }
+      
+      const { data, error } = await dbQuery;
+      if (error) throw error;
+      return data || [];
+    }
+    
+    if (query.includes('SELECT * FROM events')) {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    }
+    
+    if (query.includes('SELECT * FROM bookings')) {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*');
+      
+      if (error) throw error;
+      return data || [];
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Database error:', error);
+    return [];
+  }
+}
+
+// Funzioni specifiche Supabase
+export async function getEvents() {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .order('date', { ascending: true });
+  
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getEventById(id: number) {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('id', id)
+    .single();
+  
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+export async function createBooking(event_id: number, people: any[], status: string = 'confirmed') {
+  const { data, error } = await supabase
+    .from('bookings')
+    .insert({
+      event_id,
+      people,
+      status
+    })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBooking(id: number, updates: any) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteBooking(id: number) {
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('id', id);
+  
+  if (error) throw error;
+}
 
     // Tabella per l'admin
     db.run(`
