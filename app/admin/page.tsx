@@ -42,20 +42,20 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-pink-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-xl p-8">
           {/* Logo */}
           <Link href="/">
             <div className="flex items-center justify-center gap-2 mb-8 cursor-pointer hover:opacity-80">
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">A</span>
+              <div className="w-12 h-12 bg-pink-400 rounded-lg flex items-center justify-center">
+                <span className="text-black font-bold text-xl">A</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900">Alya Admin</h1>
             </div>
           </Link>
 
-          <p className="text-center text-gray-600 mb-8">Accedi all'area amministrativa</p>
+          <p className="text-center text-black mb-8">Accedi all'area amministrativa</p>
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg text-sm">
@@ -65,7 +65,7 @@ export default function AdminLogin() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
                 Email
               </label>
               <input
@@ -73,13 +73,13 @@ export default function AdminLogin() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="admin@alya.it"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                placeholder="example@example.it"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
                 Password
               </label>
               <input
@@ -87,7 +87,7 @@ export default function AdminLogin() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                 placeholder="Inserisci la password"
               />
             </div>
@@ -95,20 +95,20 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition"
+              className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-black font-semibold py-2 px-4 rounded-lg transition"
             >
               {loading ? 'Accesso in corso...' : 'Accedi'}
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-center text-sm text-gray-600">
+            <p className="text-center text-sm text-black">
               Credenziali di prova:<br />
-              <span className="font-mono text-xs text-gray-500">admin@alya.it / admin123</span>
+              <span className="font-mono text-xs text-gray-700">admin@alya.it / admin123</span>
             </p>
           </div>
 
-          <Link href="/" className="block text-center text-sm text-blue-600 hover:text-blue-800 mt-4">
+          <Link href="/" className="block text-center text-sm text-black hover:text-gray-700 mt-10 underline">
             Torna alla home
           </Link>
         </div>

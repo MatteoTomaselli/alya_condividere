@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { formatDate } from '@/lib/dateFormatter';
 
 interface Event {
   id: number;
@@ -67,7 +67,7 @@ export default function EventCarousel() {
   return (
     <div className="w-full">
       <div className="relative bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="relative h-96">
+        <div className="relative h-[500px]">
           {events.map((event, index) => (
             <div
               key={event.id}
@@ -86,8 +86,8 @@ export default function EventCarousel() {
                     <div className="absolute inset-0 bg-black/40 flex items-end">
                       <div className="w-full p-6 text-white">
                         <h3 className="text-2xl font-bold mb-2">{event.title}</h3>
-                        <p className="text-sm mb-2">{event.date} - {event.time}</p>
                         <p className="text-sm opacity-90">{event.location}</p>
+                        <p className="text-sm mb-2">{formatDate(event.date)} - {event.time}</p>
                         <div className="mt-3 text-sm">
                           Posti disponibili: <span className="font-bold">{event.available_seats}/{event.max_capacity}</span>
                         </div>
@@ -103,20 +103,20 @@ export default function EventCarousel() {
         {/* Frecce di navigazione */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 z-10"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-white rounded-full p-2 z-10"
           aria-label="Evento precedente"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 z-10"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-white rounded-full p-2 z-10"
           aria-label="Evento successivo"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>

@@ -3,11 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { formatDate } from '@/lib/dateFormatter';
 
 interface Person {
   name: string;
   surname: string;
   email: string;
+  dateOfBirth: string;
+  phone: string;
 }
 
 interface Event {
@@ -28,8 +31,9 @@ export default function EventDetail() {
   
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '' }]);
+  const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '' }]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [photoAuthAccepted, setPhotoAuthAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -72,7 +76,7 @@ export default function EventDetail() {
       return;
     }
 
-    if (people.some(p => !p.name || !p.surname || !p.email)) {
+    if (people.some(p => !p.name || !p.surname || !p.email || !p.dateOfBirth || !p.phone)) {
       setMessage('Compila tutti i campi');
       return;
     }
@@ -96,8 +100,30 @@ export default function EventDetail() {
       const data = await response.json();
       
       if (response.ok) {
+        // Invia email di conferma
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: people[0].email,
+              name: people[0].name,
+              surname: people[0].surname,
+              event: {
+                title: event?.title,
+                date: event?.date,
+                time: event?.time,
+                location: event?.location,
+                price: '22€'
+              }
+            })
+          });
+        } catch (emailError) {
+          console.error('Errore nell\'invio email:', emailError);
+        }
+        
         setMessage('Prenotazione confermata! Ti abbiamo inviato un\'email di conferma.');
-        setPeople([{ name: '', surname: '', email: '' }]);
+        setPeople([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '' }]);
         setPrivacyAccepted(false);
         // Ricarica l'evento per aggiornare i posti disponibili
         const eventResponse = await fetch(`/api/events/${eventId}`);
@@ -131,15 +157,17 @@ export default function EventDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-pink-100">
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
           <Link href="/">
             <div className="flex items-center gap-3 hover:opacity-80">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
+              <img 
+                src="/alya-logo.jpeg" 
+                alt="Alya Logo" 
+                className="w-10 h-10 rounded-lg object-cover"
+              />
               <h1 className="text-2xl font-bold text-gray-900">Alya Events</h1>
             </div>
           </Link>
@@ -150,35 +178,35 @@ export default function EventDetail() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/" className="text-blue-600 hover:text-blue-800 mb-6 inline-block">
+        <Link href="/" className="text-black hover:text-gray-700 mb-6 inline-block">
           ← Torna agli eventi
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Dettagli evento */}
           <div className="lg:col-span-1 order-2 lg:order-1">
             <div className="bg-white rounded-lg shadow p-6 sticky top-6">
-              <h2 className="text-2xl font-bold mb-4">Dettagli</h2>
+              <h2 className="text-2xl font-bold mb-4 text-black">Dettagli</h2>
               
               <div className="space-y-4 mb-6">
                 <div>
-                  <p className="text-gray-600 text-sm">Data</p>
-                  <p className="font-semibold">{event.date}</p>
+                  <p className="text-black text-sm">Data</p>
+                  <p className="font-semibold text-black">{formatDate(event.date)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Ora</p>
-                  <p className="font-semibold">{event.time}</p>
+                  <p className="text-black text-sm">Ora</p>
+                  <p className="font-semibold text-black">{event.time}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Luogo</p>
-                  <p className="font-semibold">{event.location}</p>
+                  <p className="text-black text-sm">Luogo</p>
+                  <p className="font-semibold text-black">{event.location}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Capacità</p>
-                  <p className="font-semibold">{event.max_capacity} posti</p>
+                  <p className="text-black text-sm">Prezzo</p>
+                  <p className="font-semibold text-black">22€</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Posti Disponibili</p>
+                  <p className="text-black text-sm">Posti Disponibili</p>
                   <p className={`font-semibold text-lg ${event.available_seats > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {event.available_seats > 0 ? event.available_seats : 'Esaurito'}
                   </p>
@@ -195,7 +223,7 @@ export default function EventDetail() {
           </div>
 
           {/* Immagine e form */}
-          <div className="lg:col-span-2 order-1 lg:order-2">
+          <div className="lg:col-span-3 order-1 lg:order-2">
             <div className="mb-8">
               <img
                 src={event.image_url}
@@ -205,20 +233,19 @@ export default function EventDetail() {
             </div>
 
             <div className="bg-white rounded-lg shadow p-8 mb-8">
-              <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
-              <p className="text-gray-600 text-lg leading-relaxed mb-8">{event.description}</p>
+              <h1 className="text-4xl font-bold mb-4 text-black">{event.title}</h1>
+              <p className="text-black text-lg leading-relaxed mb-8">{event.description}</p>
 
               {/* Form di prenotazione */}
               {event.available_seats > 0 && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold mb-4">Registra i partecipanti</h3>
-                    <p className="text-gray-600 mb-4">Massimo {Math.min(event.available_seats, 10)} persone per prenotazione</p>
+                    <h3 className="text-xl font-semibold mb-4 text-black">Registra i partecipanti</h3>
 
                     {people.map((person, index) => (
                       <div key={index} className="mb-6 pb-6 border-b last:border-b-0">
                         <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-semibold text-gray-900">Persona {index + 1}</h4>
+                          <h4 className="font-semibold text-black">Persona {index + 1}</h4>
                           {people.length > 1 && (
                             <button
                               type="button"
@@ -232,7 +259,7 @@ export default function EventDetail() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-black mb-1">
                               Nome *
                             </label>
                             <input
@@ -240,12 +267,12 @@ export default function EventDetail() {
                               required
                               value={person.name}
                               onChange={(e) => updatePerson(index, 'name', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                               placeholder="Es. Marco"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-black mb-1">
                               Cognome *
                             </label>
                             <input
@@ -253,13 +280,13 @@ export default function EventDetail() {
                               required
                               value={person.surname}
                               onChange={(e) => updatePerson(index, 'surname', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                               placeholder="Es. Rossi"
                             />
                           </div>
                         </div>
                         <div className="mt-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
                             Email *
                           </label>
                           <input
@@ -267,9 +294,36 @@ export default function EventDetail() {
                             required
                             value={person.email}
                             onChange={(e) => updatePerson(index, 'email', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                             placeholder="esempio@email.com"
                           />
+                        </div>
+                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-black mb-1">
+                              Data di Nascita *
+                            </label>
+                            <input
+                              type="date"
+                              required
+                              value={person.dateOfBirth}
+                              onChange={(e) => updatePerson(index, 'dateOfBirth', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-black mb-1">
+                              Numero di Telefono *
+                            </label>
+                            <input
+                              type="tel"
+                              required
+                              value={person.phone}
+                              onChange={(e) => updatePerson(index, 'phone', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                              placeholder="Es. +39 123 456 7890"
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -278,7 +332,7 @@ export default function EventDetail() {
                       <button
                         type="button"
                         onClick={addPerson}
-                        className="text-blue-600 hover:text-blue-800 font-semibold text-sm mb-6"
+                        className="text-black hover:text-gray-700 font-semibold text-sm mb-6"
                       >
                         + Aggiungi un'altra persona
                       </button>
@@ -292,11 +346,36 @@ export default function EventDetail() {
                       id="privacy"
                       checked={privacyAccepted}
                       onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded cursor-pointer"
+                      className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
                     />
-                    <label htmlFor="privacy" className="ml-3 text-sm text-gray-600">
+                    <label htmlFor="privacy" className="ml-3 text-sm text-black">
                       Accetto la normativa sulla privacy e i termini e condizioni *
                     </label>
+                  </div>
+
+                  {/* Photo Authorization Checkbox */}
+                  <div className="flex items-start">
+                    <input
+                      type="checkbox"
+                      id="photoAuth"
+                      checked={photoAuthAccepted}
+                      onChange={(e) => setPhotoAuthAccepted(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
+                    />
+                    <label htmlFor="photoAuth" className="ml-3 text-sm text-black">
+                      Autorizzo la realizzazione e l'utilizzo di foto e video durante gli eventi per finalità promozionali
+                    </label>
+                  </div>
+
+                  <div className="text-sm">
+                    <a
+                      href="/privacy.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-black underline hover:text-gray-700"
+                    >
+                      Visualizza i termini privacy
+                    </a>
                   </div>
 
                   {/* Message */}
@@ -310,7 +389,7 @@ export default function EventDetail() {
                   <button
                     type="submit"
                     disabled={submitting || !privacyAccepted}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition"
+                    className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-black font-semibold py-3 px-4 rounded-lg transition"
                   >
                     {submitting ? 'Prenotazione in corso...' : 'Prenota Ora'}
                   </button>
