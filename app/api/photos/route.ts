@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, readdir, unlink } from 'fs/promises';
-import { join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { createClient } from '@supabase/supabase-js';
 
-const UPLOAD_DIR = join(process.cwd(), 'public', 'event-photos');
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+const BUCKET_NAME = 'event-photos';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,27 +18,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File e event_id richiesti' }, { status: 400 });
     }
 
-    // Crea directory se non esiste
-    if (!existsSync(UPLOAD_DIR)) {
-      mkdirSync(UPLOAD_DIR, { recursive: true });
-    }
-
-    const eventDir = join(UPLOAD_DIR, event_id);
-    if (!existsSync(eventDir)) {
-      mkdirSync(eventDir, { recursive: true });
-    }
-
-    // Salva il file
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const timestamp = Date.now();
     const filename = `${timestamp}-${file.name}`;
-    const filepath = join(eventDir, filename);
+    const filepath = `${event_id}/${filename}`;
 
-    await writeFile(filepath, buffer);
+    const { data, error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(filepath, buffer, { 
+        contentType: file.type,
+        upsert: false
+      });
+
+    if (error) {
+      console.error('Supabase storage error:', error);
+      return NextResponse.json({ error: 'Errore durante l\'upload' }, { status: 500 });
+    }
+
+    // Genera URL pubblico
+    const { data: publicData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(filepath);
 
     return NextResponse.json({
-      url: `/event-photos/${event_id}/${filename}`
+      url: publicData.publicUrl
     });
   } catch (error) {
     console.error('Errore upload foto:', error);
@@ -52,19 +59,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'event_id richiesto' }, { status: 400 });
     }
 
-    const eventDir = join(UPLOAD_DIR, event_id);
+    const { data, error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .list(event_id, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' }
+      });
 
-    if (!existsSync(eventDir)) {
+    if (error) {
+      console.error('Errore lettura foto:', error);
       return NextResponse.json({ photos: [] });
     }
 
-    const files = await readdir(eventDir);
-    const photos = files.map(file => `/event-photos/${event_id}/${file}`);
+    const photos = (data || []).map(file => {
+      const { data: publicData } = supabase.storage
+        .from(BUCKET_NAME)
+        .getPublicUrl(`${event_id}/${file.name}`);
+      return publicData.publicUrl;
+    });
 
     return NextResponse.json({ photos });
   } catch (error) {
     console.error('Errore lettura foto:', error);
-    return NextResponse.json({ error: 'Errore durante la lettura' }, { status: 500 });
+    return NextResponse.json({ error: 'Errore durante la lettura', photos: [] }, { status: 500 });
   }
 }
 
@@ -77,21 +95,22 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'URL foto richiesto' }, { status: 400 });
     }
 
-    // Estrai il percorso da URL: /event-photos/123/timestamp-file.jpg
-    const pathParts = url.split('/event-photos/');
-    if (pathParts.length !== 2) {
+    // Estrai il percorso dall'URL Supabase
+    // URL formato: https://nlrnbgkkbxkmuqsehbrb.supabase.co/storage/v1/object/public/event-photos/1/1234-photo.jpg
+    const pathMatch = url.match(/\/event-photos\/(.+?)\/(.+)/);
+    if (!pathMatch) {
       return NextResponse.json({ error: 'URL non valido' }, { status: 400 });
     }
 
-    const filepath = join(UPLOAD_DIR, pathParts[1]);
+    const filepath = `${pathMatch[1]}/${pathMatch[2]}`;
 
-    // Verifica che il file sia in UPLOAD_DIR per sicurezza
-    if (!filepath.startsWith(UPLOAD_DIR)) {
-      return NextResponse.json({ error: 'Accesso negato' }, { status: 403 });
-    }
+    const { error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .remove([filepath]);
 
-    if (existsSync(filepath)) {
-      await unlink(filepath);
+    if (error) {
+      console.error('Errore eliminazione foto:', error);
+      return NextResponse.json({ error: 'Errore durante l\'eliminazione' }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Foto eliminata' });
