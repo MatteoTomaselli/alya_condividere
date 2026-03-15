@@ -27,6 +27,8 @@ interface Event {
   date: string;
   time: string;
   max_capacity: number;
+  booked_seats?: number;
+  available_seats?: number;
 }
 
 export default function AdminDashboard() {
@@ -63,11 +65,20 @@ export default function AdminDashboard() {
       const eventsData = await eventsRes.json();
       const bookingsData = await bookingsRes.json();
 
-      setEvents(eventsData);
+      // Carica i posti prenotati per ogni evento
+      const eventsWithBookings = await Promise.all(
+        eventsData.map(async (event: Event) => {
+          const eventResponse = await fetch(`/api/events/${event.id}`);
+          const eventData = await eventResponse.json();
+          return eventData;
+        })
+      );
+
+      setEvents(eventsWithBookings);
       setBookings(bookingsData);
       
-      if (eventsData.length > 0) {
-        setSelectedEvent(eventsData[0].id);
+      if (eventsWithBookings.length > 0) {
+        setSelectedEvent(eventsWithBookings[0].id);
       }
     } catch (error) {
       console.error('Errore nel caricamento dei dati:', error);
@@ -173,11 +184,19 @@ export default function AdminDashboard() {
             </Link>
             <Link
               href="/about"
-              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
+              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
               onClick={() => setSideMenuOpen(false)}
             >
               <i className="mdi mdi-information-variant-circle text-2xl" />
               Chi Siamo
+            </Link>
+            <Link
+              href="/#collaborations"
+              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
+              onClick={() => setSideMenuOpen(false)}
+            >
+              <i className="mdi mdi-handshake text-2xl" />
+              Con chi collaboriamo
             </Link>
           </div>
         </div>
@@ -251,10 +270,10 @@ export default function AdminDashboard() {
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <h3 className="font-semibold text-gray-900">{event.title}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{formatDate(event.date)} - {event.time}</p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Posti: {event.max_capacity}
+                    <h3 className="font-semibold text-lg text-gray-900">{event.title}</h3>
+                    <p className="text-base text-gray-600 mt-1">{formatDate(event.date)} - {event.time}</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Posti disponibili: <span className="font-bold">{event.available_seats}/{event.max_capacity}</span>
                     </p>
                   </button>
                 ))}
@@ -278,15 +297,15 @@ export default function AdminDashboard() {
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">ID</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Nome</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Cognome</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Data di Nascita</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Telefono</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Data Prenotazione</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Stato</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700">Azioni</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nome</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Cognome</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Data di Nascita</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Telefono</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Data Prenotazione</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Stato</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Azioni</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
@@ -296,9 +315,9 @@ export default function AdminDashboard() {
 
                         return (
                           <tr key={booking.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 text-sm text-gray-900">{booking.id}</td>
+                            <td className="px-6 py-4 text-base text-gray-900">{booking.id}</td>
                             {people.map((p, idx) => (
-                              <td key={idx} colSpan={people.length === 1 ? 1 : 0} className="px-6 py-4 text-sm">
+                              <td key={idx} colSpan={people.length === 1 ? 1 : 0} className="px-6 py-4 text-base">
                                 {isEditing ? (
                                   <div className="space-y-1">
                                     <input
@@ -309,17 +328,17 @@ export default function AdminDashboard() {
                                         newPeople[idx].name = e.target.value;
                                         setEditingPeople(newPeople);
                                       }}
-                                      className="block w-full px-2 py-1 border rounded text-xs text-black"
+                                      className="block w-full px-2 py-1 border rounded text-sm text-black"
                                       placeholder="Nome"
                                     />
                                   </div>
                                 ) : (
-                                  <div className="text-xs text-gray-900">{p.name}</div>
+                                  <div className="text-sm text-gray-900">{p.name}</div>
                                 )}
                               </td>
                             ))}
                             {people.map((p, idx) => (
-                              <td key={`surname-${idx}`} className="px-6 py-4 text-sm">
+                              <td key={`surname-${idx}`} className="px-6 py-4 text-base">
                                 {isEditing ? (
                                   <div className="space-y-1">
                                     <input
@@ -330,17 +349,17 @@ export default function AdminDashboard() {
                                         newPeople[idx].surname = e.target.value;
                                         setEditingPeople(newPeople);
                                       }}
-                                      className="block w-full px-2 py-1 border rounded text-xs text-black"
+                                      className="block w-full px-2 py-1 border rounded text-sm text-black"
                                       placeholder="Cognome"
                                     />
                                   </div>
                                 ) : (
-                                  <div className="text-xs text-gray-900">{p.surname}</div>
+                                  <div className="text-sm text-gray-900">{p.surname}</div>
                                 )}
                               </td>
                             ))}
                             {people.map((p, idx) => (
-                              <td key={`email-${idx}`} className="px-6 py-4 text-sm">
+                              <td key={`email-${idx}`} className="px-6 py-4 text-base">
                                 {isEditing ? (
                                   <input
                                     type="email"
@@ -350,16 +369,16 @@ export default function AdminDashboard() {
                                       newPeople[idx].email = e.target.value;
                                       setEditingPeople(newPeople);
                                     }}
-                                    className="w-full px-2 py-1 border rounded text-xs text-black"
+                                    className="w-full px-2 py-1 border rounded text-sm text-black"
                                     placeholder="Email"
                                   />
                                 ) : (
-                                  <div className="text-xs text-gray-600">{p.email}</div>
+                                  <div className="text-sm text-gray-600">{p.email}</div>
                                 )}
                               </td>
                             ))}
                             {people.map((p, idx) => (
-                              <td key={`dob-${idx}`} className="px-6 py-4 text-sm">
+                              <td key={`dob-${idx}`} className="px-6 py-4 text-base">
                                 {isEditing ? (
                                   <input
                                     type="date"
@@ -369,15 +388,15 @@ export default function AdminDashboard() {
                                       newPeople[idx].dateOfBirth = e.target.value;
                                       setEditingPeople(newPeople);
                                     }}
-                                    className="w-full px-2 py-1 border rounded text-xs text-black"
+                                    className="w-full px-2 py-1 border rounded text-sm text-black"
                                   />
                                 ) : (
-                                  <div className="text-xs text-gray-600">{formatDate(p.dateOfBirth)}</div>
+                                  <div className="text-sm text-gray-600">{formatDate(p.dateOfBirth)}</div>
                                 )}
                               </td>
                             ))}
                             {people.map((p, idx) => (
-                              <td key={`phone-${idx}`} className="px-6 py-4 text-sm">
+                              <td key={`phone-${idx}`} className="px-6 py-4 text-base">
                                 {isEditing ? (
                                   <input
                                     type="tel"
@@ -387,23 +406,23 @@ export default function AdminDashboard() {
                                       newPeople[idx].phone = e.target.value;
                                       setEditingPeople(newPeople);
                                     }}
-                                    className="w-full px-2 py-1 border rounded text-xs text-black"
+                                    className="w-full px-2 py-1 border rounded text-sm text-black"
                                     placeholder="Telefono"
                                   />
                                 ) : (
-                                  <div className="text-xs text-gray-600">{p.phone}</div>
+                                  <div className="text-sm text-gray-600">{p.phone}</div>
                                 )}
                               </td>
                             ))}
-                            <td className="px-6 py-4 text-sm text-gray-600">
+                            <td className="px-6 py-4 text-base text-gray-600">
                               {formatDate(booking.created_at)}
                             </td>
-                            <td className="px-6 py-4 text-sm">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <td className="px-6 py-4 text-base">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
                                 {booking.status}
                               </span>
                             </td>
-                            <td className="px-6 py-4 text-sm space-x-2 flex">
+                            <td className="px-6 py-4 text-base space-x-2 flex">
                               {isEditing ? (
                                 <>
                                   <button

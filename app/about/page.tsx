@@ -41,11 +41,19 @@ export default function About() {
                         </Link>
                         <Link
                             href="/about"
-                            className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
+                            className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
                             onClick={() => setSideMenuOpen(false)}
                         >
                             <i className="mdi mdi-information-variant-circle text-2xl" />
                             Chi Siamo
+                        </Link>
+                        <Link
+                            href="/#collaborations"
+                            className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
+                            onClick={() => setSideMenuOpen(false)}
+                        >
+                            <i className="mdi mdi-handshake text-2xl" />
+                            Con chi collaboriamo
                         </Link>
                     </div>
                 </div>
@@ -75,7 +83,9 @@ export default function About() {
                             <p className="text-sm font-semibold italic text-gray-600">Crea, Condividi, Vivi</p>
                         </div>
                     </Link>
-                    <div className="w-16" />
+                    <Link href="/admin" className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition">
+                        <i className="mdi mdi-account text-2xl" />
+                    </Link>
                 </div>
             </header>
 

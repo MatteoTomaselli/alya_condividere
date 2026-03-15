@@ -92,7 +92,7 @@ export default function Home() {
             href="/admin"
             className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition"
           >
-            Admin
+            <i className="mdi mdi-account text-2xl" />
           </Link>
         </div>
       </header>
@@ -140,7 +140,7 @@ export default function Home() {
 
           {/* Community & Sharing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-pink-400 hover:shadow-lg transition">
+            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-green-400 hover:shadow-lg transition">
               <h4 className="text-2xl font-bold text-black mb-4">👥 Comunità Accogliente</h4>
               <p className="text-gray-700">
                 Incontri in piccoli gruppi per mantenere un'atmosfera intima e favorire le connessioni
@@ -159,7 +159,7 @@ export default function Home() {
         <div className="mb-16" id="collaborations">
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Con chi collaboriamo</h3>
           <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-pink-400">
+            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-blue-900">
               <h4 className="text-2xl font-bold text-black mb-4">🏞️ Cascina Argentera</h4>
               <p className="text-gray-700">
                 Una location meravigliosa e accogliente nel cuore della Cascina, perfetta per i nostri eventi e attività. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.

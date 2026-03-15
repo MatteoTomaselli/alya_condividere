@@ -81,14 +81,14 @@ export default function EventCarousel() {
                     <img
                       src={event.image_url}
                       alt={event.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain md:object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-end">
                       <div className="w-full p-6 text-white">
-                        <h3 className="text-2xl font-bold mb-2">{event.title}</h3>
-                        <p className="text-sm opacity-90">{event.location}</p>
-                        <p className="text-sm mb-2">{formatDate(event.date)} - {event.time}</p>
-                        <div className="mt-3 text-sm">
+                        <h3 className="text-3xl font-bold mb-2">{event.title}</h3>
+                        <p className="text-base opacity-90">{event.location}</p>
+                        <p className="text-base mb-2">{formatDate(event.date)} - {event.time}</p>
+                        <div className="mt-3 text-base">
                           Posti disponibili: <span className="font-bold">{event.available_seats}/{event.max_capacity}</span>
                         </div>
                       </div>
