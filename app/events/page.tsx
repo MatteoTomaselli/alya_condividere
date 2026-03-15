@@ -2,10 +2,41 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { formatDate } from '@/lib/dateFormatter';
 
-export default function About() {
+interface Event {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  max_capacity: number;
+  image_url: string;
+  available_seats: number;
+}
+
+export default function Events() {
     const [sideMenuOpen, setSideMenuOpen] = useState(false);
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchEvents = async () => {
+        try {
+          const response = await fetch('/api/events');
+          const data = await response.json();
+          setEvents(data);
+        } catch (error) {
+          console.error('Errore nel caricamento degli eventi:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchEvents();
+    }, []);
 
     return (
         <div className="min-h-screen bg-pink-100 relative">
@@ -99,53 +130,72 @@ export default function About() {
 
             {/* Main Content */}
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* About Section */}
-                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-amber-500">
-                    <h2 className="text-5xl font-bold italic text-gray-900 mb-8 text-center">
-                        <br />
-                        Alya<br /><br />
-                        Crea, Condividi, Vivi
+                {/* Events Section */}
+                <div className="mb-16">
+                    <h2 className="text-5xl font-bold italic text-gray-900 mb-12 text-center">
+                        Prossimi Eventi
                     </h2>
-
-                    <p className="text-lg text-gray-700 mb-8">
-                        Alya è uno spazio dedicato alle donne e alle ragazze dove potersi incontrare,
-                        esprimere la propria creatività e condividere momenti di socialità.
-                        L'iniziativa nasce dall'esperienza di due professioniste del territorio che desiderano
-                        promuovere momenti di socialità, creatività e crescita personale attraverso semplici
-                        attività.
-                    </p>
-
-                    <p className="text-lg text-gray-700 mb-8">
-                        <strong>Spazio creativo e di benessere per donne e ragazze</strong>
-                    </p>
-
-
-
-                    <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded">
-                        <h3 className="text-2xl font-semibold text-amber-900 mb-6">Il nostro obiettivo</h3>
-                        <ul className="space-y-4 text-gray-700">
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Prendersi del tempo per sé</span>
-                            </li>
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Imparare qualcosa di nuovo</span>
-                            </li>
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Conoscere nuove persone</span>
-                            </li>
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Vivere momenti di condivisione in un ambiente accogliente</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <br />
-                    <p className="text-lg text-amber-700 font-semibold mb-8">
-                        A cura di Giorgia e Valeria
-                    </p>
+                    
+                    {loading ? (
+                      <div className="text-center py-12">
+                        <p className="text-gray-600">Caricamento eventi...</p>
+                      </div>
+                    ) : events.length === 0 ? (
+                      <div className="text-center py-12">
+                        <p className="text-gray-600">Nessun evento disponibile al momento</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-8">
+                        {events.map((event) => (
+                          <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                            {/* Immagine */}
+                            <div className="h-64 md:h-96 relative bg-gray-50 flex items-center justify-center">
+                              <Image
+                                src={event.image_url}
+                                alt={event.title}
+                                fill
+                                className="object-contain p-4"
+                              />
+                            </div>
+                            
+                            {/* Dettagli */}
+                            <div className="p-6 flex flex-col">
+                              <div className="mb-6">
+                                <h3 className="text-2xl font-bold text-gray-900 mb-3">{event.title}</h3>
+                                <p className="text-gray-700 mb-4">{event.description}</p>
+                                
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="mdi mdi-calendar text-pink-400 text-xl" />
+                                    <span className="font-semibold">{formatDate(event.date)}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="mdi mdi-clock text-pink-400 text-xl" />
+                                    <span className="font-semibold">{event.time}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="mdi mdi-map-marker text-pink-400 text-xl" />
+                                    <span className="font-semibold">{event.location}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="mdi mdi-seat text-pink-400 text-xl" />
+                                    <span className="font-semibold">Posti disponibili: {event.available_seats}/{event.max_capacity}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Button */}
+                              <Link
+                                href={`/events/${event.id}`}
+                                className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-lg transition text-center"
+                              >
+                                Prenota Ora
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                 </div>
             </main>
 

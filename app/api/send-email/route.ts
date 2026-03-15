@@ -24,7 +24,7 @@ grazie per aver prenotato il nostro primo evento Alya – crea, condividi, vivi 
 
 Siamo felici di averti con noi all'attività creativa:
 
-🎨 Paint your ToteBag con aperitivo
+🎨 Paint your Totebag con aperitivo
 
 Durante il pomeriggio dipingerai la tua tote bag personalizzata che potrai portare a casa con te, il tutto in un momento di creatività, condivisione e relax.
 
@@ -54,7 +54,7 @@ Giorgia e Valeria di Alya`;
     await transporter.sendMail({
       from: 'alya.condividere@gmail.com',
       to: email,
-      subject: 'Conferma prenotazione - Paint your ToteBag con aperitivo 🎨',
+      subject: 'Conferma prenotazione - Paint your Totebag con aperitivo 🎨',
       text: emailBody,
     });
 

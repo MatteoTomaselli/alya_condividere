@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import CascinaGallery from '@/components/CascinaGallery';
 import { useState } from 'react';
 
-export default function About() {
+export default function Collaborations() {
     const [sideMenuOpen, setSideMenuOpen] = useState(false);
 
     return (
@@ -99,53 +100,22 @@ export default function About() {
 
             {/* Main Content */}
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                {/* About Section */}
-                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-amber-500">
+                {/* Collaborations Section */}
+                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-green-500">
                     <h2 className="text-5xl font-bold italic text-gray-900 mb-8 text-center">
-                        <br />
-                        Alya<br /><br />
-                        Crea, Condividi, Vivi
+                        Con chi<br />collaboriamo
                     </h2>
 
                     <p className="text-lg text-gray-700 mb-8">
-                        Alya è uno spazio dedicato alle donne e alle ragazze dove potersi incontrare,
-                        esprimere la propria creatività e condividere momenti di socialità.
-                        L'iniziativa nasce dall'esperienza di due professioniste del territorio che desiderano
-                        promuovere momenti di socialità, creatività e crescita personale attraverso semplici
-                        attività.
+                        Alya collabora con realtà locali che condividono i nostri valori di creatività, 
+                        inclusione e benessere. Scopri i nostri partner che rendono possibili i nostri eventi.
                     </p>
 
-                    <p className="text-lg text-gray-700 mb-8">
-                        <strong>Spazio creativo e di benessere per donne e ragazze</strong>
-                    </p>
-
-
-
-                    <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded">
-                        <h3 className="text-2xl font-semibold text-amber-900 mb-6">Il nostro obiettivo</h3>
-                        <ul className="space-y-4 text-gray-700">
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Prendersi del tempo per sé</span>
-                            </li>
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Imparare qualcosa di nuovo</span>
-                            </li>
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Conoscere nuove persone</span>
-                            </li>
-                            <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
-                                <span className="text-lg">Vivere momenti di condivisione in un ambiente accogliente</span>
-                            </li>
-                        </ul>
+                    <div className="mb-8">
+                        <CascinaGallery />
                     </div>
-                    <br />
-                    <p className="text-lg text-amber-700 font-semibold mb-8">
-                        A cura di Giorgia e Valeria
-                    </p>
+
+
                 </div>
             </main>
 

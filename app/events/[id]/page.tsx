@@ -192,6 +192,14 @@ export default function EventDetail() {
               Home Page
             </Link>
             <Link
+              href="/events"
+              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
+              onClick={() => setSideMenuOpen(false)}
+            >
+              <i className="mdi mdi-calendar text-2xl" />
+              Eventi
+            </Link>
+            <Link
               href="/about"
               className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
               onClick={() => setSideMenuOpen(false)}
@@ -200,7 +208,7 @@ export default function EventDetail() {
               Chi Siamo
             </Link>
             <Link
-              href="/#collaborations"
+              href="/collaborations"
               className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
               onClick={() => setSideMenuOpen(false)}
             >
@@ -242,7 +250,7 @@ export default function EventDetail() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link href="/" className="text-black hover:text-gray-700 mb-6 inline-block">
+        <Link href="/events" className="text-black hover:text-gray-700 mb-6 inline-block">
           ← Torna agli eventi
         </Link>
 
@@ -488,7 +496,9 @@ export default function EventDetail() {
                   <li>
                     <Link href="/" className="hover:text-amber-400 transition">Home</Link>
                   </li>
+                  <li><Link href="/events" className="hover:text-amber-400 transition">Eventi</Link></li>
                   <li><Link href="/about" className="hover:text-amber-400 transition">Chi Siamo</Link></li>
+                  <li><Link href="/collaborations" className="hover:text-amber-400 transition">Con chi collaboriamo</Link></li>
                   <li><Link href="/admin" className="hover:text-amber-400 transition">Area Admin</Link></li>
                 </ul>
               </div>

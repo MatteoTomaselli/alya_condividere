@@ -1,7 +1,6 @@
 'use client';
 
 import EventCarousel from '@/components/EventCarousel';
-import CascinaGallery from '@/components/CascinaGallery';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -42,6 +41,14 @@ export default function Home() {
               Home Page
             </Link>
             <Link
+              href="/events"
+              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
+              onClick={() => setSideMenuOpen(false)}
+            >
+              <i className="mdi mdi-calendar text-2xl" />
+              Eventi
+            </Link>
+            <Link
               href="/about"
               className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
               onClick={() => setSideMenuOpen(false)}
@@ -49,19 +56,14 @@ export default function Home() {
               <i className="mdi mdi-information-variant-circle text-2xl" />
               Chi Siamo
             </Link>
-            <button
-              onClick={() => {
-                const element = document.getElementById('collaborations');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                  setSideMenuOpen(false);
-                }
-              }}
-              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold w-full text-left"
+            <Link
+              href="/collaborations"
+              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
+              onClick={() => setSideMenuOpen(false)}
             >
               <i className="mdi mdi-handshake text-2xl" />
               Con chi collaboriamo
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -156,13 +158,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Collaborations Section */}
-        <div className="mb-16" id="collaborations">
-          <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Con chi collaboriamo</h3>
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-            <CascinaGallery />
-          </div>
-        </div>
+
       </main>
 
       {/* Footer */}
@@ -187,7 +183,9 @@ export default function Home() {
                       Home
                     </button>
                   </li>
+                  <li><Link href="/events" className="hover:text-amber-400 transition">Eventi</Link></li>
                   <li><Link href="/about" className="hover:text-amber-400 transition">Chi Siamo</Link></li>
+                  <li><Link href="/collaborations" className="hover:text-amber-400 transition">Con chi collaboriamo</Link></li>
                   <li><Link href="/admin" className="hover:text-amber-400 transition">Area Admin</Link></li>
                 </ul>
               </div>
