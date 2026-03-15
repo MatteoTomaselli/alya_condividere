@@ -155,11 +155,18 @@ export default function AdminDashboard() {
   }, [selectedEvent]);
 
   const loadEventPhotos = async () => {
+    if (!selectedEvent) return;
+    
     try {
+      console.log('Loading photos for event:', selectedEvent);
       const response = await fetch(`/api/photos?event_id=${selectedEvent}`);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('Photos loaded:', data);
         setEventPhotos(data.photos || []);
+      } else {
+        console.error('Failed to load photos:', response.status);
       }
     } catch (error) {
       console.error('Errore caricamento foto:', error);
@@ -168,7 +175,10 @@ export default function AdminDashboard() {
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
-    if (!files || !selectedEvent) return;
+    if (!files || !selectedEvent) {
+      console.log('No files or selectedEvent:', { hasFiles: !!files, selectedEvent });
+      return;
+    }
 
     setUploading(true);
     try {
@@ -177,20 +187,30 @@ export default function AdminDashboard() {
         formData.append('file', files[i]);
         formData.append('event_id', selectedEvent.toString());
 
+        console.log('Uploading file:', files[i].name, 'for event:', selectedEvent);
+
         const response = await fetch('/api/photos', {
           method: 'POST',
           body: formData
         });
 
+        const data = await response.json();
+        console.log('Upload response:', { ok: response.ok, data });
+
         if (response.ok) {
-          const data = await response.json();
           setEventPhotos(prev => [...prev, data.url]);
+        } else {
+          console.error('Upload failed:', data.error);
         }
       }
     } catch (error) {
       console.error('Errore caricamento foto:', error);
+      alert('Errore durante il caricamento: ' + (error as Error).message);
     } finally {
       setUploading(false);
+      if (e.currentTarget) {
+        e.currentTarget.value = '';
+      }
     }
   };
 
