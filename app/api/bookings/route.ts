@@ -4,7 +4,7 @@ import { runAsync, getAsync, allAsync } from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { event_id, people } = body;
+    const { event_id, people, photo_auth } = body;
 
     if (!event_id || !people || people.length === 0) {
       return NextResponse.json({ error: 'Dati mancanti' }, { status: 400 });
@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
     // Crea la prenotazione
     const result = await runAsync(
-      'INSERT INTO bookings (event_id, people, status) VALUES (?, ?, ?)',
-      [event_id, JSON.stringify(people), 'confirmed']
+      'INSERT INTO bookings (event_id, people, status, photo_auth) VALUES (?, ?, ?, ?)',
+      [event_id, JSON.stringify(people), 'confirmed', photo_auth || false]
     );
 
     return NextResponse.json({ id: result.id, message: 'Prenotazione confermata' });

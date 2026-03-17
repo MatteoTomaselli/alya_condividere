@@ -12,6 +12,7 @@ interface Person {
   email: string;
   dateOfBirth: string;
   phone: string;
+  allergies?: string;
 }
 
 interface Event {
@@ -22,6 +23,7 @@ interface Event {
   time: string;
   location: string;
   max_capacity: number;
+  price: string;
   image_url: string;
   available_seats: number;
 }
@@ -32,7 +34,7 @@ export default function EventDetail() {
   
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '' }]);
+  const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [photoAuthAccepted, setPhotoAuthAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -95,7 +97,8 @@ export default function EventDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           event_id: parseInt(eventId as string),
-          people
+          people,
+          photo_auth: photoAuthAccepted
         })
       });
 
@@ -125,7 +128,7 @@ export default function EventDetail() {
         }
         
         setMessage('Prenotazione confermata! Ti abbiamo inviato un\'email di conferma.');
-        setPeople([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '' }]);
+        setPeople([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
         setPrivacyAccepted(false);
         // Ricarica l'evento per aggiornare i posti disponibili
         const eventResponse = await fetch(`/api/events/${eventId}`);
@@ -261,27 +264,42 @@ export default function EventDetail() {
               <h2 className="text-2xl font-bold mb-4 text-black">Dettagli</h2>
               
               <div className="space-y-4 mb-6">
-                <div>
-                  <p className="text-black text-sm">Data</p>
-                  <p className="font-semibold text-black">{formatDate(event.date)}</p>
+                <div className="flex items-center gap-2">
+                  <i className="mdi mdi-calendar text-pink-400 text-xl" />
+                  <div>
+                    <p className="text-black text-sm">Data</p>
+                    <p className="font-semibold text-black">{formatDate(event.date)}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-black text-sm">Ora</p>
-                  <p className="font-semibold text-black">{event.time}</p>
+                <div className="flex items-center gap-2">
+                  <i className="mdi mdi-clock text-pink-400 text-xl" />
+                  <div>
+                    <p className="text-black text-sm">Ora</p>
+                    <p className="font-semibold text-black">{event.time}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-black text-sm">Luogo</p>
-                  <p className="font-semibold text-black">{event.location}</p>
+                <div className="flex items-center gap-2">
+                  <i className="mdi mdi-map-marker text-pink-400 text-xl" />
+                  <div>
+                    <p className="text-black text-sm">Luogo</p>
+                    <p className="font-semibold text-black">{event.location}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-black text-sm">Prezzo</p>
-                  <p className="font-semibold text-black">22€</p>
+                <div className="flex items-center gap-2">
+                  <i className="mdi mdi-currency-eur text-pink-400 text-xl" />
+                  <div>
+                    <p className="text-black text-sm">Prezzo</p>
+                    <p className="font-semibold text-black">{event.price}€ a persona</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-black text-sm">Posti Disponibili</p>
-                  <p className={`font-semibold text-lg ${event.available_seats > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {event.available_seats > 0 ? event.available_seats : 'Esaurito'}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <i className="mdi mdi-seat text-pink-400 text-xl" />
+                  <div>
+                    <p className="text-black text-sm">Posti Disponibili</p>
+                    <p className={`font-semibold text-lg ${event.available_seats > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {event.available_seats > 0 ? event.available_seats : 'Esaurito'}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -396,6 +414,18 @@ export default function EventDetail() {
                               placeholder="Es. +39 123 456 7890"
                             />
                           </div>
+                        </div>
+                        <div className="mt-4">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Allergie
+                          </label>
+                          <textarea
+                            value={person.allergies || ''}
+                            onChange={(e) => updatePerson(index, 'allergies', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                            placeholder="Es. Nocciole, latticini, gluten-free"
+                            rows={3}
+                          />
                         </div>
                       </div>
                     ))}

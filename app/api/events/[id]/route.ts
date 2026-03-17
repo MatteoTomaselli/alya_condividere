@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAsync, allAsync } from '@/lib/db';
+import { getAsync, allAsync, runAsync } from '@/lib/db';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -24,5 +24,23 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nel recupero dell\'evento' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const eventId = parseInt(id);
+
+    // Elimina prima tutte le prenotazioni associate all'evento
+    await runAsync('DELETE FROM bookings WHERE event_id = ?', [eventId]);
+
+    // Poi elimina l'evento
+    await runAsync('DELETE FROM events WHERE id = ?', [eventId]);
+
+    return NextResponse.json({ message: 'Evento eliminato con successo' });
+  } catch (error: any) {
+    console.error('Errore nell\'eliminazione evento:', error.message, error);
+    return NextResponse.json({ error: error.message || 'Errore nell\'eliminazione dell\'evento' }, { status: 500 });
   }
 }

@@ -13,6 +13,7 @@ interface Event {
   time: string;
   location: string;
   max_capacity: number;
+  price: string;
   image_url: string;
   available_seats: number;
 }
@@ -180,6 +181,10 @@ export default function Events() {
                                   <div className="flex items-center gap-2 text-gray-600">
                                     <i className="mdi mdi-seat text-pink-400 text-xl" />
                                     <span className="font-semibold">Posti disponibili: {event.available_seats}/{event.max_capacity}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="mdi mdi-currency-eur text-pink-400 text-xl" />
+                                    <span className="font-semibold">{event.price}€ a persona</span>
                                   </div>
                                 </div>
                               </div>

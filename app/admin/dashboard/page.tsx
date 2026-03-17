@@ -12,6 +12,7 @@ interface Person {
   email: string;
   dateOfBirth: string;
   phone: string;
+  allergies?: string;
 }
 
 interface Booking {
@@ -20,14 +21,19 @@ interface Booking {
   people: string;
   status: string;
   created_at: string;
+  photo_auth?: boolean;
 }
 
 interface Event {
   id: number;
   title: string;
+  description?: string;
   date: string;
   time: string;
+  location?: string;
   max_capacity: number;
+  price?: string;
+  image_url?: string;
   booked_seats?: number;
   available_seats?: number;
 }
@@ -44,6 +50,20 @@ export default function AdminDashboard() {
   const [editingPeople, setEditingPeople] = useState<Person[]>([]);
   const [eventPhotos, setEventPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    description: '',
+    date: '',
+    time: '',
+    location: '',
+    max_capacity: 20,
+    price: '',
+    image_url: ''
+  });
+  const [creatingEvent, setCreatingEvent] = useState(false);
+  const [uploadingEventImage, setUploadingEventImage] = useState(false);
+  const [eventImagePreview, setEventImagePreview] = useState<string>('');
 
   useEffect(() => {
     const adminEmail = localStorage.getItem('admin_email');
@@ -139,6 +159,111 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Errore nell\'eliminazione:', error);
+    }
+  };
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newEvent.title || !newEvent.date || !newEvent.time || !newEvent.location || !newEvent.price) {
+      alert('Compila tutti i campi obbligatori');
+      return;
+    }
+
+    if (!newEvent.image_url) {
+      alert('Carica un\'immagine per l\'evento');
+      return;
+    }
+
+    setCreatingEvent(true);
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEvent)
+      });
+
+      if (response.ok) {
+        alert('Evento creato con successo!');
+        setShowCreateEvent(false);
+        setNewEvent({
+          title: '',
+          description: '',
+          date: '',
+          time: '',
+          location: '',
+          max_capacity: 20,
+          price: '',
+          image_url: ''
+        });
+        setEventImagePreview('');
+        fetchData();
+      } else {
+        alert('Errore nella creazione dell\'evento');
+      }
+    } catch (error) {
+      console.error('Errore:', error);
+      alert('Errore nella creazione dell\'evento');
+    } finally {
+      setCreatingEvent(false);
+    }
+  };
+
+  const handleEventImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.currentTarget.files?.[0];
+    if (!file) return;
+
+    setUploadingEventImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('event_id', '0');
+
+      const response = await fetch('/api/photos', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setNewEvent(prev => ({ ...prev, image_url: data.url }));
+        setEventImagePreview(data.url);
+      } else {
+        alert('Errore caricamento immagine: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Errore:', error);
+      alert('Errore durante il caricamento dell\'immagine');
+    } finally {
+      setUploadingEventImage(false);
+      if (e.currentTarget) {
+        e.currentTarget.value = '';
+      }
+    }
+  };
+
+  const handleDeleteEvent = async (eventId: number, eventTitle: string) => {
+    if (!confirm(`Sei sicuro di voler eliminare l'evento "${eventTitle}"? Questa azione eliminerà anche tutte le prenotazioni associate.`)) return;
+
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        alert('Evento eliminato con successo!');
+        if (selectedEvent === eventId) {
+          setSelectedEvent(null);
+        }
+        fetchData();
+      } else {
+        alert('Errore nell\'eliminazione dell\'evento');
+      }
+    } catch (error) {
+      console.error('Errore:', error);
+      alert('Errore nell\'eliminazione dell\'evento');
     }
   };
 
@@ -293,6 +418,14 @@ export default function AdminDashboard() {
               Home Page
             </Link>
             <Link
+              href="/events"
+              className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
+              onClick={() => setSideMenuOpen(false)}
+            >
+              <i className="mdi mdi-calendar text-2xl" />
+              Eventi
+            </Link>
+            <Link
               href="/about"
               className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold mb-4"
               onClick={() => setSideMenuOpen(false)}
@@ -301,7 +434,7 @@ export default function AdminDashboard() {
               Chi Siamo
             </Link>
             <Link
-              href="/#collaborations"
+              href="/collaborations"
               className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-gray-100 transition text-gray-900 font-semibold"
               onClick={() => setSideMenuOpen(false)}
             >
@@ -366,26 +499,191 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* Crea Nuovo Evento */}
+            <div className="bg-white rounded-lg shadow p-6 mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-black">Crea Nuovo Evento</h2>
+                <button
+                  onClick={() => setShowCreateEvent(!showCreateEvent)}
+                  className="px-4 py-2 bg-pink-400 hover:bg-pink-500 text-white rounded-lg transition font-semibold"
+                >
+                  {showCreateEvent ? 'Chiudi' : 'Nuovo Evento'}
+                </button>
+              </div>
+
+              {showCreateEvent && (
+                <form onSubmit={handleCreateEvent} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Titolo *</label>
+                      <input
+                        type="text"
+                        required
+                        value={newEvent.title}
+                        onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                        placeholder="Es. Paint your Totebag con aperitivo"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Data *</label>
+                      <input
+                        type="date"
+                        required
+                        value={newEvent.date}
+                        onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Ora *</label>
+                      <input
+                        type="time"
+                        required
+                        value={newEvent.time}
+                        onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Posti Disponibili *</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={newEvent.max_capacity || ''}
+                        onChange={(e) => setNewEvent({...newEvent, max_capacity: e.target.value ? parseInt(e.target.value) : 20})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Prezzo (€) *</label>
+                      <input
+                        type="text"
+                        required
+                        value={newEvent.price}
+                        onChange={(e) => setNewEvent({...newEvent, price: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                        placeholder="Es. 22 o 15.50"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Luogo *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newEvent.location}
+                      onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                      placeholder="Es. Cascina Argentera, Torino"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Descrizione</label>
+                    <textarea
+                      value={newEvent.description}
+                      onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-black"
+                      placeholder="Descrizione dell'evento"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-2">Immagine Evento *</label>
+                    <div className="flex gap-4 items-start">
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleEventImageUpload}
+                          disabled={uploadingEventImage}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400"
+                        />
+                        {uploadingEventImage && <p className="text-sm text-gray-600 mt-2">Caricamento...</p>}
+                        {newEvent.image_url && <p className="text-sm text-green-600 mt-2">✓ Immagine caricata</p>}
+                      </div>
+                      {eventImagePreview && (
+                        <div className="w-24 h-24 flex-shrink-0 relative rounded-lg overflow-hidden border border-gray-200">
+                          <img
+                            src={eventImagePreview}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <button
+                      type="submit"
+                      disabled={creatingEvent}
+                      className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-lg transition"
+                    >
+                      {creatingEvent ? 'Creando...' : 'Crea Evento'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowCreateEvent(false);
+                        setNewEvent({
+                          title: '',
+                          description: '',
+                          date: '',
+                          time: '',
+                          location: '',
+                          max_capacity: 20,
+                          price: '',
+                          image_url: ''
+                        });
+                        setEventImagePreview('');
+                      }}
+                      className="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition"
+                    >
+                      Annulla
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+
             {/* Selezione Evento */}
             <div className="bg-white rounded-lg shadow p-6 mb-8">
               <h2 className="text-xl font-bold mb-4 text-black">Seleziona Evento</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {events.map(event => (
-                  <button
+                  <div
                     key={event.id}
-                    onClick={() => setSelectedEvent(event.id)}
-                    className={`p-6 rounded-lg border-2 transition text-left min-h-[150px] flex flex-col justify-between ${
+                    className={`p-6 rounded-lg border-2 transition ${
                       selectedEvent === event.id
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <h3 className="font-semibold text-lg text-gray-900">{event.title}</h3>
-                    <p className="text-base text-gray-600 mt-1">{formatDate(event.date)} - {event.time}</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Posti disponibili: <span className="font-bold">{event.available_seats}/{event.max_capacity}</span>
-                    </p>
-                  </button>
+                    <div className="flex justify-between items-start mb-4">
+                      <button
+                        onClick={() => setSelectedEvent(event.id)}
+                        className="flex-1 text-left"
+                      >
+                        <h3 className="font-semibold text-lg text-gray-900">{event.title}</h3>
+                        <p className="text-base text-gray-600 mt-1">{formatDate(event.date)} - {event.time}</p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Posti disponibili: <span className="font-bold">{event.available_seats}/{event.max_capacity}</span>
+                        </p>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEvent(event.id, event.title)}
+                        className="ml-2 text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition"
+                        title="Elimina evento"
+                      >
+                        <i className="mdi mdi-delete text-2xl" />
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -413,6 +711,8 @@ export default function AdminDashboard() {
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Data di Nascita</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Telefono</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Allergie</th>
+                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Foto/Video</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Data Prenotazione</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Stato</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Azioni</th>
@@ -524,6 +824,30 @@ export default function AdminDashboard() {
                                 )}
                               </td>
                             ))}
+                            {people.map((p, idx) => (
+                              <td key={`allergies-${idx}`} className="px-6 py-4 text-base">
+                                {isEditing ? (
+                                  <textarea
+                                    value={p.allergies || ''}
+                                    onChange={(e) => {
+                                      const newPeople = [...editingPeople];
+                                      newPeople[idx].allergies = e.target.value;
+                                      setEditingPeople(newPeople);
+                                    }}
+                                    className="w-full px-2 py-1 border rounded text-sm text-black"
+                                    placeholder="Allergie"
+                                    rows={1}
+                                  />
+                                ) : (
+                                  <div className="text-sm text-gray-600">{p.allergies || '-'}</div>
+                                )}
+                              </td>
+                            ))}
+                            <td className="px-6 py-4 text-base">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${booking.photo_auth ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                {booking.photo_auth ? 'Sì' : 'No'}
+                              </span>
+                            </td>
                             <td className="px-6 py-4 text-base text-gray-600">
                               {formatDate(booking.created_at)}
                             </td>

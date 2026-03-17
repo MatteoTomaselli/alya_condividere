@@ -15,12 +15,37 @@ export async function runAsync(query: string, params: any[] = []) {
         .insert({
           event_id: params[0],
           people: params[1],
-          status: params[2] || 'confirmed'
+          status: params[2] || 'confirmed',
+          photo_auth: params[3] || false
         })
         .select()
         .single();
       
       if (error) throw error;
+      return data;
+    }
+
+    // Per INSERT INTO events
+    if (query.includes('INSERT INTO events')) {
+      const { data, error } = await supabase
+        .from('events')
+        .insert({
+          title: params[0],
+          description: params[1],
+          date: params[2],
+          time: params[3],
+          location: params[4],
+          max_capacity: params[5],
+          price: params[6],
+          image_url: params[7]
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Supabase INSERT events error:', error);
+        throw error;
+      }
       return data;
     }
 
@@ -42,10 +67,35 @@ export async function runAsync(query: string, params: any[] = []) {
 
     // Per DELETE bookings
     if (query.includes('DELETE FROM bookings')) {
+      if (query.includes('WHERE event_id')) {
+        // Elimina tutte le prenotazioni per un evento
+        const eventId = params[0];
+        const { error } = await supabase
+          .from('bookings')
+          .delete()
+          .eq('event_id', eventId);
+        
+        if (error) throw error;
+        return { success: true };
+      } else {
+        // Elimina una prenotazione specifica
+        const id = params[0];
+        const { error } = await supabase
+          .from('bookings')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        return { success: true };
+      }
+    }
+
+    // Per DELETE events
+    if (query.includes('DELETE FROM events')) {
       const id = params[0];
       
       const { error } = await supabase
-        .from('bookings')
+        .from('events')
         .delete()
         .eq('id', id);
       

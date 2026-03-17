@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { allAsync } from '@/lib/db';
+import { allAsync, runAsync } from '@/lib/db';
 
 export async function GET() {
   try {
@@ -37,5 +37,26 @@ export async function GET() {
   } catch (error) {
     console.error('Errore nel recupero degli eventi:', error);
     return NextResponse.json({ error: 'Errore nel recupero degli eventi' }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { title, description, date, time, location, max_capacity, price, image_url } = body;
+
+    if (!title || !date || !time || !location || !price) {
+      return NextResponse.json({ error: 'Campi obbligatori mancanti' }, { status: 400 });
+    }
+
+    const result = await runAsync(
+      'INSERT INTO events (title, description, date, time, location, max_capacity, price, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [title, description || '', date, time, location, max_capacity || 20, price, image_url || '']
+    );
+
+    return NextResponse.json({ id: result.id, message: 'Evento creato con successo' });
+  } catch (error: any) {
+    console.error('Errore nella creazione evento:', error.message, error);
+    return NextResponse.json({ error: error.message || 'Errore nella creazione evento' }, { status: 500 });
   }
 }

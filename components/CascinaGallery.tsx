@@ -80,7 +80,7 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
       </div>
 
       <p className="text-gray-700">
-        Una location meravigliosa e accogliente nel cuore della Cascina, perfetta per i nostri eventi e attività. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.
+        Una location meravigliosa e accogliente perfetta per i nostri eventi e attività. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.
       </p>
     </div>
   );
