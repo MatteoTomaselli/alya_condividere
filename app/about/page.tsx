@@ -115,10 +115,6 @@ export default function About() {
                         attività.
                     </p>
 
-                    <p className="text-lg text-gray-700 mb-8">
-                        <strong>Spazio creativo e di benessere per donne e ragazze</strong>
-                    </p>
-
 
 
                     <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded">
