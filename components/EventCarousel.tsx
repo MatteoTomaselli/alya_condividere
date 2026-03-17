@@ -25,13 +25,13 @@ export default function EventCarousel() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('/api/events');
+        const response = await fetch('/api/events', { cache: 'no-store' });
         const data = await response.json();
         
         // Carica i posti prenotati per ogni evento
         const eventsWithBookings = await Promise.all(
           data.map(async (event: Event) => {
-            const eventResponse = await fetch(`/api/events/${event.id}`);
+            const eventResponse = await fetch(`/api/events/${event.id}`, { cache: 'no-store' });
             const eventData = await eventResponse.json();
             return eventData;
           })

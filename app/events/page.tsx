@@ -26,7 +26,7 @@ export default function Events() {
     useEffect(() => {
       const fetchEvents = async () => {
         try {
-          const response = await fetch('/api/events');
+          const response = await fetch('/api/events', { cache: 'no-store' });
           const data = await response.json();
           setEvents(data);
         } catch (error) {

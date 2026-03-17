@@ -103,6 +103,33 @@ export async function runAsync(query: string, params: any[] = []) {
       return { success: true };
     }
 
+    // Per UPDATE events
+    if (query.includes('UPDATE events')) {
+      const eventId = params[params.length - 1]; // L'ultimo parametro è l'ID
+      
+      const { data, error } = await supabase
+        .from('events')
+        .update({
+          title: params[0],
+          description: params[1],
+          date: params[2],
+          time: params[3],
+          location: params[4],
+          max_capacity: params[5],
+          price: params[6],
+          image_url: params[7]
+        })
+        .eq('id', eventId)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Supabase UPDATE events error:', error);
+        throw error;
+      }
+      return data;
+    }
+
     // Fallback per altre query
     return { id: Date.now() };
   } catch (error) {

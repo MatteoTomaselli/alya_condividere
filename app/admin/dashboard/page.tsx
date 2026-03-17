@@ -64,6 +64,8 @@ export default function AdminDashboard() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [uploadingEventImage, setUploadingEventImage] = useState(false);
   const [eventImagePreview, setEventImagePreview] = useState<string>('');
+  const [editingEventId, setEditingEventId] = useState<number | null>(null);
+  const [editingEventData, setEditingEventData] = useState<Partial<Event>>({});
 
   useEffect(() => {
     const adminEmail = localStorage.getItem('admin_email');
@@ -265,6 +267,65 @@ export default function AdminDashboard() {
       console.error('Errore:', error);
       alert('Errore nell\'eliminazione dell\'evento');
     }
+  };
+
+  const handleEditEvent = (event: Event) => {
+    setEditingEventId(event.id);
+    setEditingEventData({
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      time: event.time,
+      location: event.location,
+      max_capacity: event.max_capacity,
+      price: event.price,
+      image_url: event.image_url
+    });
+  };
+
+  const handleUpdateEvent = async () => {
+    // Verifica più dettagliatamente i campi
+    const missingFields = [];
+    if (!editingEventId) missingFields.push('ID evento');
+    if (!editingEventData.title) missingFields.push('Titolo');
+    if (!editingEventData.date) missingFields.push('Data');
+    if (!editingEventData.time) missingFields.push('Ora');
+    if (!editingEventData.location) missingFields.push('Luogo');
+    if (!editingEventData.price) missingFields.push('Prezzo');
+    if (!editingEventData.max_capacity) missingFields.push('Posti disponibili');
+
+    if (missingFields.length > 0) {
+      alert('Compila i campi obbligatori:\n- ' + missingFields.join('\n- '));
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/events/${editingEventId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingEventData)
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        alert('Evento aggiornato con successo!');
+        setEditingEventId(null);
+        setEditingEventData({});
+        fetchData();
+      } else {
+        alert('Errore nell\'aggiornamento dell\'evento: ' + (responseData.error || 'Errore sconosciuto'));
+        console.error('API Error:', responseData);
+      }
+    } catch (error) {
+      console.error('Errore:', error);
+      alert('Errore nell\'aggiornamento dell\'evento: ' + (error as Error).message);
+    }
+  };
+
+  const handleCancelEditEvent = () => {
+    setEditingEventId(null);
+    setEditingEventData({});
   };
 
   const filteredBookings = selectedEvent
@@ -676,6 +737,13 @@ export default function AdminDashboard() {
                         </p>
                       </button>
                       <button
+                        onClick={() => handleEditEvent(event)}
+                        className="ml-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-2 rounded-lg transition"
+                        title="Modifica evento"
+                      >
+                        <i className="mdi mdi-pencil text-2xl" />
+                      </button>
+                      <button
                         onClick={() => handleDeleteEvent(event.id, event.title)}
                         className="ml-2 text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition"
                         title="Elimina evento"
@@ -687,6 +755,105 @@ export default function AdminDashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Modifica Evento */}
+            {editingEventId && (
+              <div className="bg-white rounded-lg shadow p-6 mb-8 border-l-4 border-blue-500">
+                <h2 className="text-xl font-bold text-black mb-6">Modifica Evento</h2>
+                <form onSubmit={(e) => { e.preventDefault(); handleUpdateEvent(); }} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Titolo *</label>
+                      <input
+                        type="text"
+                        required
+                        value={editingEventData.title || ''}
+                        onChange={(e) => setEditingEventData({...editingEventData, title: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Data *</label>
+                      <input
+                        type="date"
+                        required
+                        value={editingEventData.date || ''}
+                        onChange={(e) => setEditingEventData({...editingEventData, date: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Ora *</label>
+                      <input
+                        type="time"
+                        required
+                        value={editingEventData.time || ''}
+                        onChange={(e) => setEditingEventData({...editingEventData, time: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Posti Disponibili *</label>
+                      <input
+                        type="number"
+                        required
+                        min="1"
+                        value={editingEventData.max_capacity || ''}
+                        onChange={(e) => setEditingEventData({...editingEventData, max_capacity: e.target.value ? parseInt(e.target.value) : 20})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Prezzo (€) *</label>
+                      <input
+                        type="text"
+                        required
+                        value={editingEventData.price || ''}
+                        onChange={(e) => setEditingEventData({...editingEventData, price: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Luogo *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingEventData.location || ''}
+                      onChange={(e) => setEditingEventData({...editingEventData, location: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-black mb-1">Descrizione</label>
+                    <textarea
+                      value={editingEventData.description || ''}
+                      onChange={(e) => setEditingEventData({...editingEventData, description: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-semibold"
+                    >
+                      Salva Modifiche
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelEditEvent}
+                      className="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition font-semibold"
+                    >
+                      Annulla
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
 
             {/* Prenotazioni */}
             <div className="bg-white rounded-lg shadow overflow-hidden">

@@ -44,3 +44,33 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     return NextResponse.json({ error: error.message || 'Errore nell\'eliminazione dell\'evento' }, { status: 500 });
   }
 }
+
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const eventId = parseInt(id);
+    const body = await request.json();
+
+    const { title, description, date, time, location, max_capacity, price, image_url } = body;
+
+    console.log('PUT request received:', { eventId, body });
+
+    if (!title || !date || !time || !location || !price || !max_capacity) {
+      console.log('Validation failed:', { title, date, time, location, price, max_capacity });
+      return NextResponse.json({ error: 'Campi obbligatori mancanti' }, { status: 400 });
+    }
+
+    const maxCapInt = parseInt(max_capacity.toString());
+    console.log('Updating event with:', { title, date, time, location, maxCapInt, price });
+
+    await runAsync(
+      'UPDATE events SET title = ?, description = ?, date = ?, time = ?, location = ?, max_capacity = ?, price = ?, image_url = ? WHERE id = ?',
+      [title, description || null, date, time, location, maxCapInt, price, image_url || null, eventId]
+    );
+
+    return NextResponse.json({ message: 'Evento aggiornato con successo' });
+  } catch (error: any) {
+    console.error('Errore nell\'aggiornamento evento:', error.message, error);
+    return NextResponse.json({ error: error.message || 'Errore nell\'aggiornamento dell\'evento' }, { status: 500 });
+  }
+}

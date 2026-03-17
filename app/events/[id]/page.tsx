@@ -44,7 +44,7 @@ export default function EventDetail() {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const response = await fetch(`/api/events/${eventId}`);
+        const response = await fetch(`/api/events/${eventId}`, { cache: 'no-store' });
         const data = await response.json();
         setEvent(data);
       } catch (error) {
