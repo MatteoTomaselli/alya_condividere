@@ -354,12 +354,14 @@ export default function EventGallery() {
                       >
                         <i className="mdi mdi-download" /> Scarica
                       </button>
-                      <button
-                        onClick={() => handleDeletePhoto(photo.id)}
-                        className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition"
-                      >
-                        <i className="mdi mdi-trash-can-outline" /> Elimina
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDeletePhoto(photo.id)}
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition"
+                        >
+                          <i className="mdi mdi-trash-can-outline" /> Elimina
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
