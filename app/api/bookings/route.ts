@@ -32,6 +32,31 @@ export async function POST(request: NextRequest) {
       [event_id, JSON.stringify(people), 'confirmed', photo_auth || false]
     );
 
+    // Invia email di conferma per ogni persona
+    try {
+      for (const person of people) {
+        await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: person.email,
+            name: person.name,
+            surname: person.surname,
+            event: {
+              title: event.title,
+              date: event.date,
+              time: event.time,
+              location: event.location,
+              price: event.price,
+            },
+          }),
+        });
+      }
+    } catch (emailError) {
+      console.error('Errore nell\'invio dell\'email di conferma:', emailError);
+      // Non fallire la prenotazione se l'email fallisce
+    }
+
     return NextResponse.json({ id: result.id, message: 'Prenotazione confermata' });
   } catch (error: any) {
     console.error('Errore:', error);

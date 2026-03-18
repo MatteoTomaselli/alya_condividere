@@ -931,7 +931,6 @@ export default function AdminDashboard() {
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">ID</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Nome</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Cognome</th>
                         <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Email</th>
@@ -951,7 +950,6 @@ export default function AdminDashboard() {
 
                         return (
                           <tr key={booking.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 text-base text-gray-900">{booking.id}</td>
                             {people.map((p, idx) => (
                               <td key={idx} colSpan={people.length === 1 ? 1 : 0} className="px-6 py-4 text-base">
                                 {isEditing ? (
