@@ -28,9 +28,9 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-blue-900">
-      <h4 className="text-2xl font-bold text-black mb-6">🏞️ Cascina Argentera</h4>
-      
+    <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-purple-900">
+      <h4 className="text-2xl font-bold text-black mb-6">Cascina Argentera</h4>
+
       <div className="relative mb-6">
         <div className="relative h-[400px] rounded-lg overflow-hidden bg-gray-100">
           <img
@@ -38,7 +38,7 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
             alt={`Cascina foto ${currentIndex + 1}`}
             className="w-full h-full object-cover"
           />
-          
+
           {/* Navigation Buttons */}
           <button
             onClick={prevSlide}
@@ -66,9 +66,8 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`relative h-20 rounded-lg overflow-hidden border-2 transition ${
-              index === currentIndex ? 'border-blue-900' : 'border-gray-300'
-            }`}
+            className={`relative h-20 rounded-lg overflow-hidden border-2 transition ${index === currentIndex ? 'border-blue-900' : 'border-gray-300'
+              }`}
           >
             <img
               src={photo}
@@ -80,7 +79,7 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
       </div>
 
       <p className="text-gray-700">
-        Una location meravigliosa e accogliente perfetta per i nostri eventi e attività. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.
+        Una location meravigliosa e accogliente perfetta per i nostri eventi e attività alle porte di Torino. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.
       </p>
     </div>
   );

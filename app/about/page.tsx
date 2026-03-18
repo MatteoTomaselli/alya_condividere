@@ -61,7 +61,7 @@ export default function About() {
                             onClick={() => setSideMenuOpen(false)}
                         >
                             <i className="mdi mdi-handshake text-2xl" />
-                            Con chi collaboriamo
+                            I nostri spazi
                         </Link>
                     </div>
                 </div>
@@ -87,7 +87,7 @@ export default function About() {
                             />
                         </div>
                         <div className="text-center">
-                            <h1 className="text-2xl font-bold italic text-gray-900">Alya</h1>
+                            <h1 className="text-2xl font-bold italic text-gray-900 breathing">Alya</h1>
                             <p className="text-sm font-semibold italic text-gray-600">Crea, Condividi, Vivi</p>
                         </div>
                     </Link>
@@ -100,46 +100,43 @@ export default function About() {
             {/* Main Content */}
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* About Section */}
-                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-amber-500">
+                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-purple-500">
                     <h2 className="text-5xl font-bold italic text-gray-900 mb-8 text-center">
                         <br />
-                        Alya<br /><br />
-                        Crea, Condividi, Vivi
+                        <span className="breathing">Alya</span><br />
+                        
                     </h2>
 
                     <p className="text-lg text-gray-700 mb-8">
-                        Alya è uno spazio dedicato alle donne e alle ragazze dove potersi incontrare,
-                        esprimere la propria creatività e condividere momenti di socialità.
-                        L'iniziativa nasce dall'esperienza di due professioniste del territorio che desiderano
-                        promuovere momenti di socialità, creatività e crescita personale attraverso semplici
-                        attività.
+                        <span className="breathing">Alya</span> è crescita: uno spazio in cui prendersi tempo per sé, creare e condividere momenti che fanno stare bene
+                        I due fiori rappresentano l’incontro tra persone che crescono insieme, mentre il cerchio è condivisione, uno spazio dove siamo tutte allo stesso livello.
                     </p>
 
 
 
-                    <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded">
-                        <h3 className="text-2xl font-semibold text-amber-900 mb-6">Il nostro obiettivo</h3>
+                    <div className="bg-purple-50 border-l-4 border-purple-500 p-6 rounded">
+                        <h3 className="text-2xl font-semibold text-purple-900 mb-6">Il nostro obiettivo</h3>
                         <ul className="space-y-4 text-gray-700">
                             <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
+                                <span className="text-purple-600 font-bold mr-4 text-lg">•</span>
                                 <span className="text-lg">Prendersi del tempo per sé</span>
                             </li>
                             <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
+                                <span className="text-purple-600 font-bold mr-4 text-lg">•</span>
                                 <span className="text-lg">Imparare qualcosa di nuovo</span>
                             </li>
                             <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
+                                <span className="text-purple-600 font-bold mr-4 text-lg">•</span>
                                 <span className="text-lg">Conoscere nuove persone</span>
                             </li>
                             <li className="flex items-start">
-                                <span className="text-amber-600 font-bold mr-4 text-lg">•</span>
+                                <span className="text-purple-600 font-bold mr-4 text-lg">•</span>
                                 <span className="text-lg">Vivere momenti di condivisione in un ambiente accogliente</span>
                             </li>
                         </ul>
                     </div>
                     <br />
-                    <p className="text-lg text-amber-700 font-semibold mb-8">
+                    <p className="text-lg text-purple-700 font-semibold mb-8">
                         A cura di Giorgia e Valeria
                     </p>
                 </div>
@@ -151,7 +148,7 @@ export default function About() {
                     <div className="flex justify-between items-start">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1">
                             <div>
-                                <h4 className="text-lg font-semibold mb-4">Alya</h4>
+                                <h4 className="text-lg font-semibold mb-4"><span className="breathing">Alya</span></h4>
                                 <p className="text-gray-400 text-sm">
                                     Spazio creativo e di benessere per donne e ragazze. Un progetto di Giorgia e Valeria.
                                 </p>
@@ -193,7 +190,7 @@ export default function About() {
                         </div>
                     </div>
                     <div className="border-t border-gray-800 mt-8 pt-8 flex justify-end">
-                        <p className="text-gray-400 text-sm">© 2026 Alya - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
+                        <p className="text-gray-400 text-sm">© 2026 <span className="breathing">Alya</span> - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
                     </div>
                 </div>
             </footer>

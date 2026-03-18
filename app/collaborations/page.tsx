@@ -62,7 +62,7 @@ export default function Collaborations() {
                             onClick={() => setSideMenuOpen(false)}
                         >
                             <i className="mdi mdi-handshake text-2xl" />
-                            Con chi collaboriamo
+                            I nostri spazi
                         </Link>
                     </div>
                 </div>
@@ -88,7 +88,7 @@ export default function Collaborations() {
                             />
                         </div>
                         <div className="text-center">
-                            <h1 className="text-2xl font-bold italic text-gray-900">Alya</h1>
+                            <h1 className="text-2xl font-bold italic text-gray-900 breathing">Alya</h1>
                             <p className="text-sm font-semibold italic text-gray-600">Crea, Condividi, Vivi</p>
                         </div>
                     </Link>
@@ -101,13 +101,13 @@ export default function Collaborations() {
             {/* Main Content */}
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Collaborations Section */}
-                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-green-500">
+                <div className="bg-white rounded-lg shadow-lg p-8 mb-8 border-t-4 border-purple-500">
                     <h2 className="text-5xl font-bold italic text-gray-900 mb-8 text-center">
-                        Con chi<br />collaboriamo
+                        I nostri spazi
                     </h2>
 
                     <p className="text-lg text-gray-700 mb-8">
-                        Alya collabora con realtà locali che condividono i nostri valori di creatività, 
+                        <span className="breathing">Alya</span> collabora con realtà locali che condividono i nostri valori di creatività, 
                         inclusione e benessere. Scopri i nostri partner che rendono possibili i nostri eventi.
                     </p>
 
@@ -125,7 +125,7 @@ export default function Collaborations() {
                     <div className="flex justify-between items-start">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1">
                             <div>
-                                <h4 className="text-lg font-semibold mb-4">Alya</h4>
+                                <h4 className="text-lg font-semibold mb-4"><span className="breathing">Alya</span></h4>
                                 <p className="text-gray-400 text-sm">
                                     Spazio creativo e di benessere per donne e ragazze. Un progetto di Giorgia e Valeria.
                                 </p>

@@ -11,17 +11,16 @@ export default function Home() {
     <div className="min-h-screen bg-pink-100 relative">
       {/* Side Menu Overlay */}
       {sideMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 pointer-events-none"
           onClick={() => setSideMenuOpen(false)}
         />
       )}
 
       {/* Side Menu */}
-      <div 
-        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 z-50 ${
-          sideMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+      <div
+        className={`fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 z-50 ${sideMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="p-6">
           <button
@@ -30,7 +29,7 @@ export default function Home() {
           >
             ✕
           </button>
-          
+
           <div className="mt-12">
             <Link
               href="/"
@@ -62,7 +61,7 @@ export default function Home() {
               onClick={() => setSideMenuOpen(false)}
             >
               <i className="mdi mdi-handshake text-2xl" />
-              Con chi collaboriamo
+              I nostri spazi
             </Link>
           </div>
         </div>
@@ -78,16 +77,16 @@ export default function Home() {
           </button>
           <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition">
             <div className="w-14 h-14 relative">
-              <Image 
-                src="/alya-logo.jpeg" 
-                alt="Alya Logo" 
-                width={56} 
+              <Image
+                src="/alya-logo.jpeg"
+                alt="Alya Logo"
+                width={56}
                 height={56}
                 className="rounded-full"
               />
             </div>
             <div className="text-center">
-              <h1 className="text-2xl font-bold italic text-gray-900">Alya</h1>
+              <h1 className="text-2xl font-bold italic text-gray-900 breathing">Alya</h1>
               <p className="text-sm font-semibold italic text-gray-600">Crea, Condividi, Vivi</p>
             </div>
           </Link>
@@ -105,8 +104,8 @@ export default function Home() {
         {/* Logo Card */}
         <div className="shadow-lg p-12 flex justify-center mb-16 rounded-lg border-4 border-white" style={{ backgroundColor: '#EEEDEB' }}>
           <div className="w-80 h-80 relative overflow-hidden">
-            <Image 
-              src="/alya-logo.jpeg" 
+            <Image
+              src="/alya-logo.jpeg"
               alt="Alya Logo"
               fill
               className="object-cover rounded-full"
@@ -128,7 +127,9 @@ export default function Home() {
             <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-pink-400">
               <h4 className="text-2xl font-bold text-black mb-4">🎨 Laboratori Creativi</h4>
               <p className="text-gray-700">
-                Spazi pensati per stimolare la tua creatività e permetterti di sperimentare diverse tecniche artistiche. Un luogo dove esprimere la tua fantasia, scoprire nuove passioni e creare qualcosa di unico e personale, in un ambiente accogliente e ispirato.
+                Spazi pensati per esprimere e stimolare la propria creatività e fantasia, attraverso diverse tecniche artistiche.
+                Un luogo per scoprire nuove passioni e creare qualcosa di unico e personale.
+
               </p>
             </div>
 
@@ -136,7 +137,7 @@ export default function Home() {
             <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-purple-400">
               <h4 className="text-2xl font-bold text-black mb-4">🌸 Attività di Benessere</h4>
               <p className="text-gray-700">
-                Momenti dedicati al relax e alla cura di sé, pensati per rigenerarti corpo e mente. Attività che favoriscono il benessere personale, il rilassamento e l'armonia, in un ambiente tranquillo e rigenerante.
+                Momenti che favoriscono il benessere personale in un ambiente tranquillo e rigenerante.
               </p>
             </div>
           </div>
@@ -146,13 +147,13 @@ export default function Home() {
             <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-green-400 hover:shadow-lg transition">
               <h4 className="text-2xl font-bold text-black mb-4">👥 Comunità Accogliente</h4>
               <p className="text-gray-700">
-                Incontri in piccoli gruppi per mantenere un'atmosfera intima e favorire le connessioni
+                Incontri in piccoli gruppi per mantenere un'atmosfera intima.
               </p>
             </div>
             <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-amber-400 hover:shadow-lg transition">
               <h4 className="text-2xl font-bold text-black mb-4">🤝 Condivisione Autentica</h4>
               <p className="text-gray-700">
-                Momenti di convivialità e connessione autentica in un ambiente sicuro e inclusivo
+                Momenti di convivialità in un ambiente sicuro e inclusivo
               </p>
             </div>
           </div>
@@ -167,7 +168,7 @@ export default function Home() {
           <div className="flex justify-between items-start">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1">
               <div>
-                <h4 className="text-lg font-semibold mb-4">Alya</h4>
+                <h4 className="text-lg font-semibold mb-4"><span className="breathing">Alya</span></h4>
                 <p className="text-gray-400 text-sm">
                   Spazio creativo e di benessere per donne e ragazze. Un progetto di Giorgia e Valeria.
                 </p>
@@ -176,7 +177,7 @@ export default function Home() {
                 <h4 className="text-lg font-semibold mb-4">Link Utili</h4>
                 <ul className="space-y-2 text-gray-400">
                   <li>
-                    <button 
+                    <button
                       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                       className="hover:text-amber-400 transition cursor-pointer"
                     >
@@ -206,17 +207,17 @@ export default function Home() {
               </div>
             </div>
             <div className="w-20 h-20 relative ml-8">
-              <Image 
-                src="/alya-logo.jpeg" 
-                alt="Alya Logo" 
-                width={80} 
+              <Image
+                src="/alya-logo.jpeg"
+                alt="Alya Logo"
+                width={80}
                 height={80}
                 className="rounded-full"
               />
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 flex justify-end">
-            <p className="text-gray-400 text-sm">© 2026 Alya - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
+            <p className="text-gray-400 text-sm">© 2026 <span className="breathing">Alya</span> - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
           </div>
         </div>
       </footer>

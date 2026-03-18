@@ -93,7 +93,7 @@ export default function Events() {
                             onClick={() => setSideMenuOpen(false)}
                         >
                             <i className="mdi mdi-handshake text-2xl" />
-                            Con chi collaboriamo
+                            I nostri spazi
                         </Link>
                     </div>
                 </div>
@@ -119,7 +119,7 @@ export default function Events() {
                             />
                         </div>
                         <div className="text-center">
-                            <h1 className="text-2xl font-bold italic text-gray-900">Alya</h1>
+                            <h1 className="text-2xl font-bold italic text-gray-900 breathing">Alya</h1>
                             <p className="text-sm font-semibold italic text-gray-600">Crea, Condividi, Vivi</p>
                         </div>
                     </Link>
@@ -210,7 +210,7 @@ export default function Events() {
                     <div className="flex justify-between items-start">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1">
                             <div>
-                                <h4 className="text-lg font-semibold mb-4">Alya</h4>
+                                <h4 className="text-lg font-semibold mb-4"><span className="breathing">Alya</span></h4>
                                 <p className="text-gray-400 text-sm">
                                     Spazio creativo e di benessere per donne e ragazze. Un progetto di Giorgia e Valeria.
                                 </p>
@@ -252,7 +252,7 @@ export default function Events() {
                         </div>
                     </div>
                     <div className="border-t border-gray-800 mt-8 pt-8 flex justify-end">
-                        <p className="text-gray-400 text-sm">© 2026 Alya - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
+                        <p className="text-gray-400 text-sm">© 2026 <span className="breathing">Alya</span> - Crea, Condividi, Vivi. Tutti i diritti riservati.</p>
                     </div>
                 </div>
             </footer>

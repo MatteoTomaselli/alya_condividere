@@ -52,7 +52,7 @@ export default function AdminLogin() {
               <div className="w-12 h-12 bg-pink-400 rounded-lg flex items-center justify-center">
                 <span className="text-black font-bold text-xl">A</span>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Alya Admin</h1>
+              <h1 className="text-2xl font-bold text-gray-900"><span className="breathing">Alya</span> Admin</h1>
             </div>
           </Link>
 
