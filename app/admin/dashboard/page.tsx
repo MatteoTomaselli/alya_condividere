@@ -1249,7 +1249,7 @@ export default function AdminDashboard() {
             </div>
             <div className="w-20 h-20 relative ml-8">
               <Image 
-                src="/alya-logo.jpeg" 
+                src="/alya-logo.jpeg?v=2" 
                 alt="Alya Logo" 
                 width={80} 
                 height={80}

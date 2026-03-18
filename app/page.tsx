@@ -78,7 +78,7 @@ export default function Home() {
           <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition">
             <div className="w-14 h-14 relative">
               <Image
-                src="/alya-logo.jpeg"
+                src="/alya-logo.jpeg?v=2"
                 alt="Alya Logo"
                 width={56}
                 height={56}
@@ -105,7 +105,7 @@ export default function Home() {
         <div className="shadow-lg p-12 flex justify-center mb-16 rounded-lg border-4 border-white" style={{ backgroundColor: '#EEEDEB' }}>
           <div className="w-80 h-80 relative overflow-hidden">
             <Image
-              src="/alya-logo.jpeg"
+              src="/alya-logo.jpeg?v=2"
               alt="Alya Logo"
               fill
               className="object-cover rounded-full"
@@ -208,7 +208,7 @@ export default function Home() {
             </div>
             <div className="w-20 h-20 relative ml-8">
               <Image
-                src="/alya-logo.jpeg"
+                src="/alya-logo.jpeg?v=2"
                 alt="Alya Logo"
                 width={80}
                 height={80}
