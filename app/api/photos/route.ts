@@ -64,49 +64,45 @@ export async function GET(request: NextRequest) {
       .list(event_id, {
         limit: 100,
         offset: 0,
-        sortBy: { column: 'name', order: 'asc' }
+        sortBy: { column: 'created_at', order: 'desc' }
       });
 
     if (error) {
       console.error('Errore lettura foto:', error);
-      return NextResponse.json({ photos: [] });
+      return NextResponse.json([]);
     }
 
     const photos = (data || []).map(file => {
       const { data: publicData } = supabase.storage
         .from(BUCKET_NAME)
         .getPublicUrl(`${event_id}/${file.name}`);
-      return publicData.publicUrl;
+      return {
+        id: `${event_id}/${file.name}`,
+        url: publicData.publicUrl,
+        uploadedAt: file.created_at || new Date().toISOString()
+      };
     });
 
-    return NextResponse.json({ photos });
+    return NextResponse.json(photos);
   } catch (error) {
     console.error('Errore lettura foto:', error);
-    return NextResponse.json({ error: 'Errore durante la lettura', photos: [] }, { status: 500 });
+    return NextResponse.json([], { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url } = body;
+    const { photoId } = body;
 
-    if (!url) {
-      return NextResponse.json({ error: 'URL foto richiesto' }, { status: 400 });
+    if (!photoId) {
+      return NextResponse.json({ error: 'photoId richiesto' }, { status: 400 });
     }
 
-    // Estrai il percorso dall'URL Supabase
-    // URL formato: https://nlrnbgkkbxkmuqsehbrb.supabase.co/storage/v1/object/public/event-photos/1/1234-photo.jpg
-    const pathMatch = url.match(/\/event-photos\/(.+?)\/(.+)/);
-    if (!pathMatch) {
-      return NextResponse.json({ error: 'URL non valido' }, { status: 400 });
-    }
-
-    const filepath = `${pathMatch[1]}/${pathMatch[2]}`;
-
+    // photoId è nel formato "event_id/filename"
     const { error } = await supabase.storage
       .from(BUCKET_NAME)
-      .remove([filepath]);
+      .remove([photoId]);
 
     if (error) {
       console.error('Errore eliminazione foto:', error);

@@ -111,7 +111,7 @@ export default function Events() {
                     <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition">
                         <div className="w-14 h-14 relative">
                             <Image
-                                src="/alya-logo.jpeg?v=2"
+                                src="/logo_alya_def.jpeg"
                                 alt="Alya Logo"
                                 width={56}
                                 height={56}
@@ -189,13 +189,21 @@ export default function Events() {
                                 </div>
                               </div>
                               
-                              {/* Button */}
-                              <Link
-                                href={`/events/${event.id}`}
-                                className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-lg transition text-center"
-                              >
-                                Prenota Ora
-                              </Link>
+                              {/* Buttons */}
+                              <div className="flex flex-col gap-3">
+                                <Link
+                                  href={`/events/${event.id}`}
+                                  className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-lg transition text-center"
+                                >
+                                  Prenota Ora
+                                </Link>
+                                <Link
+                                  href={`/events/${event.id}/gallery`}
+                                  className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg transition text-center"
+                                >
+                                  Gallery
+                                </Link>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -243,7 +251,7 @@ export default function Events() {
                         </div>
                         <div className="w-20 h-20 relative ml-8">
                             <Image
-                                src="/alya-logo.jpeg?v=2"
+                                src="/logo_alya_def.jpeg"
                                 alt="Alya Logo"
                                 width={80}
                                 height={80}
@@ -259,3 +267,4 @@ export default function Events() {
         </div>
     );
 }
+

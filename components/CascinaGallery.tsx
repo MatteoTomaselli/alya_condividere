@@ -84,3 +84,4 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
     </div>
   );
 }
+

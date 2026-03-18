@@ -78,7 +78,7 @@ export default function Home() {
           <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition">
             <div className="w-14 h-14 relative">
               <Image
-                src="/alya-logo.jpeg?v=2"
+                src="/logo_alya_def.jpeg"
                 alt="Alya Logo"
                 width={56}
                 height={56}
@@ -103,12 +103,14 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Logo Card */}
         <div className="shadow-lg p-12 flex justify-center mb-16 rounded-lg border-4 border-white" style={{ backgroundColor: '#EEEDEB' }}>
-          <div className="w-80 h-80 relative overflow-hidden">
+          <div className="w-80 h-80 relative overflow-hidden flex items-center justify-center">
             <Image
-              src="/alya-logo.jpeg?v=2"
+              src="/logo_alya_def.jpeg"
               alt="Alya Logo"
-              fill
+              width={500}
+              height={500}
               className="object-cover rounded-full"
+              style={{ transform: 'scale(1.6)' }}
             />
           </div>
         </div>
@@ -208,7 +210,7 @@ export default function Home() {
             </div>
             <div className="w-20 h-20 relative ml-8">
               <Image
-                src="/alya-logo.jpeg?v=2"
+                src="/logo_alya_def.jpeg"
                 alt="Alya Logo"
                 width={80}
                 height={80}
@@ -224,3 +226,4 @@ export default function Home() {
     </div>
   );
 }
+

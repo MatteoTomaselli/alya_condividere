@@ -1127,86 +1127,7 @@ export default function AdminDashboard() {
         )}
       </main>
 
-      {/* Sezione Foto */}
-      {selectedEventInfo && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-black">
-                Foto Evento - {selectedEventInfo.title}
-              </h2>
-            </div>
 
-            <div className="p-6">
-              {/* Caricamento Foto */}
-              <div className="mb-8">
-                <label className="block text-sm font-medium text-black mb-4">
-                  Carica foto dell'evento
-                </label>
-                <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center hover:bg-pink-50 transition cursor-pointer">
-                  <input
-                    type="file"
-                    id="photo-upload"
-                    multiple
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    disabled={uploading}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="photo-upload"
-                    className="cursor-pointer block"
-                  >
-                    <i className="mdi mdi-cloud-upload text-4xl text-pink-400 mb-2" />
-                    <p className="text-gray-600 font-medium">
-                      {uploading ? 'Caricamento in corso...' : 'Clicca per selezionare le foto o trascinale qui'}
-                    </p>
-                    <p className="text-gray-500 text-sm mt-1">PNG, JPG, GIF fino a 10MB</p>
-                  </label>
-                </div>
-              </div>
-
-              {/* Galleria Foto */}
-              {eventPhotos.length > 0 ? (
-                <div>
-                  <h3 className="text-lg font-semibold text-black mb-4">Foto caricate ({eventPhotos.length})</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {eventPhotos.map((photo, index) => (
-                      <div key={index} className="relative group rounded-lg overflow-hidden shadow-md">
-                        <img
-                          src={photo}
-                          alt={`Foto ${index + 1}`}
-                          className="w-full h-48 object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition">
-                          <button
-                            onClick={() => handleDownloadPhoto(photo, index)}
-                            className="text-white hover:text-amber-400 transition"
-                            title="Scarica foto"
-                          >
-                            <i className="mdi mdi-download text-3xl" />
-                          </button>
-                          <button
-                            onClick={() => handleDeletePhoto(index)}
-                            className="text-white hover:text-red-400 transition"
-                            title="Elimina foto"
-                          >
-                            <i className="mdi mdi-delete text-3xl" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-center text-gray-500 py-8">
-                  Nessuna foto caricata ancora
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white mt-16">
@@ -1249,7 +1170,7 @@ export default function AdminDashboard() {
             </div>
             <div className="w-20 h-20 relative ml-8">
               <Image 
-                src="/alya-logo.jpeg?v=2" 
+                src="/logo_alya_def.jpeg" 
                 alt="Alya Logo" 
                 width={80} 
                 height={80}
@@ -1265,3 +1186,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
