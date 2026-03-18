@@ -34,6 +34,7 @@ export default function EventGallery() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchEventAndPhotos = async () => {
@@ -59,6 +60,11 @@ export default function EventGallery() {
         setLoading(false);
       }
     };
+
+    // Check if user is admin
+    const adminEmail = localStorage.getItem('admin_email');
+    const adminSession = localStorage.getItem('admin_session');
+    setIsAdmin(!!(adminEmail && adminSession));
 
     fetchEventAndPhotos();
   }, [eventId]);
@@ -289,28 +295,34 @@ export default function EventGallery() {
         )}
 
         {/* Upload Section */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Carica Foto</h2>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-pink-400 transition">
-            <div className="mb-4">
-              <i className="mdi mdi-camera-plus text-5xl text-gray-400" />
+        {isAdmin ? (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Carica Foto</h2>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-pink-400 transition">
+              <div className="mb-4">
+                <i className="mdi mdi-camera-plus text-5xl text-gray-400" />
+              </div>
+              <p className="text-gray-600 mb-4">Clicca o trascina le immagini qui per caricarle</p>
+              <label className="inline-block">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+                <span className="inline-block bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition disabled:opacity-50">
+                  {uploading ? 'Caricamento...' : 'Seleziona Immagini'}
+                </span>
+              </label>
             </div>
-            <p className="text-gray-600 mb-4">Clicca o trascina le immagini qui per caricarle</p>
-            <label className="inline-block">
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handlePhotoUpload}
-                disabled={uploading}
-                className="hidden"
-              />
-              <span className="inline-block bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition disabled:opacity-50">
-                {uploading ? 'Caricamento...' : 'Seleziona Immagini'}
-              </span>
-            </label>
           </div>
-        </div>
+        ) : (
+          <div className="bg-blue-50 border border-blue-300 rounded-lg p-6 mb-8">
+            <p className="text-blue-700">Solo gli admin possono caricare foto. <Link href="/admin" className="font-semibold hover:underline">Accedi come admin</Link></p>
+          </div>
+        )}
 
         {/* Photos Gallery */}
         <div>
