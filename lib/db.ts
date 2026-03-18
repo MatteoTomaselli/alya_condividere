@@ -10,13 +10,20 @@ export async function runAsync(query: string, params: any[] = []) {
   try {
     // Per INSERT INTO bookings
     if (query.includes('INSERT INTO bookings')) {
+      // Struttura: [event_id, name, surname, email, date_of_birth, phone, allergies, photo_auth, status, booking_group_id]
       const { data, error } = await supabase
         .from('bookings')
         .insert({
           event_id: params[0],
-          people: params[1],
-          status: params[2] || 'confirmed',
-          photo_auth: params[3] || false
+          name: params[1],
+          surname: params[2],
+          email: params[3],
+          date_of_birth: params[4],
+          phone: params[5],
+          allergies: params[6],
+          photo_auth: params[7],
+          status: params[8] || 'confirmed',
+          booking_group_id: params[9]
         })
         .select()
         .single();
@@ -174,6 +181,24 @@ export async function getAsync(query: string, params: any[] = []) {
 
 export async function allAsync(query: string, params: any[] = []) {
   try {
+    // Parsing per SELECT COUNT(*)
+    if (query.includes('SELECT COUNT(*)')) {
+      const eventId = params[0];
+      const status = params[1];
+      let dbQuery = supabase.from('bookings').select('id', { count: 'exact', head: true });
+      
+      if (eventId) {
+        dbQuery = dbQuery.eq('event_id', eventId);
+      }
+      if (status) {
+        dbQuery = dbQuery.eq('status', status);
+      }
+
+      const { count, error } = await dbQuery;
+      if (error) throw error;
+      return [{ count: count || 0 }];
+    }
+
     // Parsing per SELECT con WHERE
     if (query.includes('SELECT * FROM bookings WHERE event_id')) {
       const eventId = params[0];

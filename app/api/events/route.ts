@@ -8,17 +8,9 @@ export async function GET() {
     // Calcola posti disponibili per ogni evento
     const eventsWithSeats = await Promise.all(events.map(async (event: any) => {
       try {
-        const bookings = await allAsync('SELECT * FROM bookings WHERE event_id = ? AND status = ?', [event.id, 'confirmed']);
-        
-        let totalBookedSeats = 0;
-        bookings.forEach((booking: any) => {
-          try {
-            const people = JSON.parse(booking.people);
-            totalBookedSeats += people.length;
-          } catch (e) {
-            console.error('Errore parsing people:', e);
-          }
-        });
+        // Conta il numero di persone prenotate (ogni riga = una persona)
+        const bookings = await allAsync('SELECT COUNT(*) as count FROM bookings WHERE event_id = ? AND status = ?', [event.id, 'confirmed']);
+        const totalBookedSeats = bookings[0]?.count || 0;
         
         return {
           ...event,

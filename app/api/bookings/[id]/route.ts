@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { runAsync, getAsync } from '@/lib/db';
+import { supabase } from '@/lib/db';
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -12,8 +12,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }
 
-    await runAsync('DELETE FROM bookings WHERE id = ?', [bookingId]);
-    return NextResponse.json({ message: 'Prenotazione eliminata' });
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', bookingId);
+
+    if (error) throw error;
+
+    return NextResponse.json({ message: 'Persona eliminata' });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nell\'eliminazione' }, { status: 500 });
   }
@@ -30,17 +36,33 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }
 
-    const { people, status } = body;
+    const { name, surname, email, date_of_birth, phone, allergies, photo_auth, status } = body;
 
-    if (people) {
-      await runAsync('UPDATE bookings SET people = ? WHERE id = ?', [JSON.stringify(people), bookingId]);
+    // Aggiorna i campi singoli della persona
+    const updates: any = {};
+    if (name !== undefined) updates.name = name;
+    if (surname !== undefined) updates.surname = surname;
+    if (email !== undefined) updates.email = email;
+    if (date_of_birth !== undefined) updates.date_of_birth = date_of_birth;
+    if (phone !== undefined) updates.phone = phone;
+    if (allergies !== undefined) updates.allergies = allergies;
+    if (photo_auth !== undefined) updates.photo_auth = photo_auth;
+    if (status !== undefined) updates.status = status;
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'Nessun campo da aggiornare' }, { status: 400 });
     }
 
-    if (status) {
-      await runAsync('UPDATE bookings SET status = ? WHERE id = ?', [status, bookingId]);
-    }
+    const { data, error } = await supabase
+      .from('bookings')
+      .update(updates)
+      .eq('id', bookingId)
+      .select()
+      .single();
 
-    return NextResponse.json({ message: 'Prenotazione aggiornata' });
+    if (error) throw error;
+
+    return NextResponse.json({ message: 'Persona aggiornata', data });
   } catch (error) {
     return NextResponse.json({ error: 'Errore nell\'aggiornamento' }, { status: 500 });
   }

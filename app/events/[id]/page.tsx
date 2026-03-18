@@ -13,6 +13,7 @@ interface Person {
   dateOfBirth: string;
   phone: string;
   allergies?: string;
+  photo_auth?: boolean;
 }
 
 interface Event {
@@ -36,7 +37,6 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(true);
   const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  const [photoAuthAccepted, setPhotoAuthAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
@@ -58,7 +58,7 @@ export default function EventDetail() {
   }, [eventId]);
 
   const addPerson = () => {
-    setPeople([...people, { name: '', surname: '', email: '' }]);
+    setPeople([...people, { name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '', photo_auth: false }]);
   };
 
   const removePerson = (index: number) => {
@@ -66,7 +66,7 @@ export default function EventDetail() {
     setPeople(newPeople);
   };
 
-  const updatePerson = (index: number, field: string, value: string) => {
+  const updatePerson = (index: number, field: string, value: string | boolean) => {
     const newPeople = [...people];
     newPeople[index] = { ...newPeople[index], [field]: value };
     setPeople(newPeople);
@@ -97,8 +97,7 @@ export default function EventDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           event_id: parseInt(eventId as string),
-          people,
-          photo_auth: photoAuthAccepted
+          people
         })
       });
 
@@ -355,7 +354,7 @@ export default function EventDetail() {
                             <input
                               type="text"
                               required
-                              value={person.name}
+                              value={person.name || ''}
                               onChange={(e) => updatePerson(index, 'name', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                               placeholder="Es. Marco"
@@ -368,7 +367,7 @@ export default function EventDetail() {
                             <input
                               type="text"
                               required
-                              value={person.surname}
+                              value={person.surname || ''}
                               onChange={(e) => updatePerson(index, 'surname', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                               placeholder="Es. Rossi"
@@ -382,7 +381,7 @@ export default function EventDetail() {
                           <input
                             type="email"
                             required
-                            value={person.email}
+                            value={person.email || ''}
                             onChange={(e) => updatePerson(index, 'email', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                             placeholder="esempio@email.com"
@@ -396,7 +395,7 @@ export default function EventDetail() {
                             <input
                               type="date"
                               required
-                              value={person.dateOfBirth}
+                              value={person.dateOfBirth || ''}
                               onChange={(e) => updatePerson(index, 'dateOfBirth', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                             />
@@ -408,7 +407,7 @@ export default function EventDetail() {
                             <input
                               type="tel"
                               required
-                              value={person.phone}
+                              value={person.phone || ''}
                               onChange={(e) => updatePerson(index, 'phone', e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                               placeholder="Es. +39 123 456 7890"
@@ -426,6 +425,19 @@ export default function EventDetail() {
                             placeholder="Es. Nocciole, latticini, gluten-free"
                             rows={3}
                           />
+                        </div>
+                        <div className="mt-4">
+                          <label className="flex items-start">
+                            <input
+                              type="checkbox"
+                              checked={person.photo_auth || false}
+                              onChange={(e) => updatePerson(index, 'photo_auth', e.target.checked)}
+                              className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
+                            />
+                            <span className="ml-3 text-sm text-black">
+                              Autorizzo la realizzazione e l'utilizzo di foto e video durante gli eventi per finalità promozionali
+                            </span>
+                          </label>
                         </div>
                       </div>
                     ))}
@@ -452,20 +464,6 @@ export default function EventDetail() {
                     />
                     <label htmlFor="privacy" className="ml-3 text-sm text-black">
                       Accetto la normativa sulla privacy e i termini e condizioni *
-                    </label>
-                  </div>
-
-                  {/* Photo Authorization Checkbox */}
-                  <div className="flex items-start">
-                    <input
-                      type="checkbox"
-                      id="photoAuth"
-                      checked={photoAuthAccepted}
-                      onChange={(e) => setPhotoAuthAccepted(e.target.checked)}
-                      className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
-                    />
-                    <label htmlFor="photoAuth" className="ml-3 text-sm text-black">
-                      Autorizzo la realizzazione e l'utilizzo di foto e video durante gli eventi per finalità promozionali
                     </label>
                   </div>
 

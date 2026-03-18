@@ -13,15 +13,22 @@ interface Person {
   dateOfBirth: string;
   phone: string;
   allergies?: string;
+  photo_auth?: boolean;
 }
 
 interface Booking {
   id: number;
   event_id: number;
-  people: string;
+  name: string;
+  surname: string;
+  email: string;
+  date_of_birth: string;
+  phone: string;
+  allergies?: string;
+  photo_auth: boolean;
   status: string;
+  booking_group_id?: string;
   created_at: string;
-  photo_auth?: boolean;
 }
 
 interface Event {
@@ -46,8 +53,18 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editingBooking, setEditingBooking] = useState<number | null>(null);
-  const [editingPeople, setEditingPeople] = useState<Person[]>([]);
+  interface EditingPerson {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    date_of_birth: string;
+    phone: string;
+    allergies?: string;
+    photo_auth: boolean;
+  }
+
+  const [editingPerson, setEditingPerson] = useState<EditingPerson | null>(null);
   const [eventPhotos, setEventPhotos] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -119,25 +136,43 @@ export default function AdminDashboard() {
     router.push('/admin');
   };
 
-  const handleEditBooking = (booking: Booking) => {
-    setEditingBooking(booking.id);
-    setEditingPeople(JSON.parse(booking.people));
+  const handleEditPerson = (booking: Booking) => {
+    setEditingPerson({
+      id: booking.id,
+      name: booking.name,
+      surname: booking.surname,
+      email: booking.email,
+      date_of_birth: booking.date_of_birth,
+      phone: booking.phone,
+      allergies: booking.allergies,
+      photo_auth: booking.photo_auth
+    });
   };
 
-  const handleSaveBooking = async (bookingId: number) => {
+  const handleSavePerson = async () => {
+    if (!editingPerson) return;
+
     try {
       const adminEmail = localStorage.getItem('admin_email');
-      const response = await fetch(`/api/bookings/${bookingId}`, {
+      const response = await fetch(`/api/bookings/${editingPerson.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-Admin-Email': adminEmail || ''
         },
-        body: JSON.stringify({ people: editingPeople })
+        body: JSON.stringify({
+          name: editingPerson.name,
+          surname: editingPerson.surname,
+          email: editingPerson.email,
+          date_of_birth: editingPerson.date_of_birth,
+          phone: editingPerson.phone,
+          allergies: editingPerson.allergies,
+          photo_auth: editingPerson.photo_auth
+        })
       });
 
       if (response.ok) {
-        setEditingBooking(null);
+        setEditingPerson(null);
         fetchData();
       }
     } catch (error) {
@@ -145,8 +180,10 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteBooking = async (bookingId: number) => {
-    if (!confirm('Sei sicuro di voler eliminare questa prenotazione?')) return;
+  const handleDeletePerson = async (bookingId: number, personName: string, personSurname: string) => {
+    if (!confirm(`Sei sicuro di voler eliminare ${personName} ${personSurname}?`)) {
+      return;
+    }
 
     try {
       const adminEmail = localStorage.getItem('admin_email');
@@ -582,13 +619,13 @@ export default function AdminDashboard() {
               <div className="bg-white rounded-lg shadow p-6">
                 <p className="text-gray-600 text-sm">Partecipanti Confermati</p>
                 <p className="text-3xl font-bold text-purple-600">
-                  {bookings.reduce((sum, b) => sum + JSON.parse(b.people).length, 0)}
+                  {bookings.length}
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow p-6">
                 <p className="text-gray-600 text-sm">Posti Utilizzati</p>
                 <p className="text-3xl font-bold text-orange-600">
-                  {bookings.reduce((sum, b) => sum + JSON.parse(b.people).length, 0)}/
+                  {bookings.length}/
                   {events.reduce((sum, e) => sum + e.max_capacity, 0)}
                 </p>
               </div>
@@ -945,132 +982,103 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {filteredBookings.map(booking => {
-                        const people = JSON.parse(booking.people) as Person[];
-                        const isEditing = editingBooking === booking.id;
+                        const isEditing = editingPerson?.id === booking.id;
 
                         return (
                           <tr key={booking.id} className="hover:bg-gray-50">
-                            {people.map((p, idx) => (
-                              <td key={idx} colSpan={people.length === 1 ? 1 : 0} className="px-6 py-4 text-base">
-                                {isEditing ? (
-                                  <div className="space-y-1">
-                                    <input
-                                      type="text"
-                                      value={p.name}
-                                      onChange={(e) => {
-                                        const newPeople = [...editingPeople];
-                                        newPeople[idx].name = e.target.value;
-                                        setEditingPeople(newPeople);
-                                      }}
-                                      className="block w-full px-2 py-1 border rounded text-sm text-black"
-                                      placeholder="Nome"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="text-sm text-gray-900">{p.name}</div>
-                                )}
-                              </td>
-                            ))}
-                            {people.map((p, idx) => (
-                              <td key={`surname-${idx}`} className="px-6 py-4 text-base">
-                                {isEditing ? (
-                                  <div className="space-y-1">
-                                    <input
-                                      type="text"
-                                      value={p.surname}
-                                      onChange={(e) => {
-                                        const newPeople = [...editingPeople];
-                                        newPeople[idx].surname = e.target.value;
-                                        setEditingPeople(newPeople);
-                                      }}
-                                      className="block w-full px-2 py-1 border rounded text-sm text-black"
-                                      placeholder="Cognome"
-                                    />
-                                  </div>
-                                ) : (
-                                  <div className="text-sm text-gray-900">{p.surname}</div>
-                                )}
-                              </td>
-                            ))}
-                            {people.map((p, idx) => (
-                              <td key={`email-${idx}`} className="px-6 py-4 text-base">
-                                {isEditing ? (
-                                  <input
-                                    type="email"
-                                    value={p.email}
-                                    onChange={(e) => {
-                                      const newPeople = [...editingPeople];
-                                      newPeople[idx].email = e.target.value;
-                                      setEditingPeople(newPeople);
-                                    }}
-                                    className="w-full px-2 py-1 border rounded text-sm text-black"
-                                    placeholder="Email"
-                                  />
-                                ) : (
-                                  <div className="text-sm text-gray-600">{p.email}</div>
-                                )}
-                              </td>
-                            ))}
-                            {people.map((p, idx) => (
-                              <td key={`dob-${idx}`} className="px-6 py-4 text-base">
-                                {isEditing ? (
-                                  <input
-                                    type="date"
-                                    value={p.dateOfBirth}
-                                    onChange={(e) => {
-                                      const newPeople = [...editingPeople];
-                                      newPeople[idx].dateOfBirth = e.target.value;
-                                      setEditingPeople(newPeople);
-                                    }}
-                                    className="w-full px-2 py-1 border rounded text-sm text-black"
-                                  />
-                                ) : (
-                                  <div className="text-sm text-gray-600">{formatDate(p.dateOfBirth)}</div>
-                                )}
-                              </td>
-                            ))}
-                            {people.map((p, idx) => (
-                              <td key={`phone-${idx}`} className="px-6 py-4 text-base">
-                                {isEditing ? (
-                                  <input
-                                    type="tel"
-                                    value={p.phone}
-                                    onChange={(e) => {
-                                      const newPeople = [...editingPeople];
-                                      newPeople[idx].phone = e.target.value;
-                                      setEditingPeople(newPeople);
-                                    }}
-                                    className="w-full px-2 py-1 border rounded text-sm text-black"
-                                    placeholder="Telefono"
-                                  />
-                                ) : (
-                                  <div className="text-sm text-gray-600">{p.phone}</div>
-                                )}
-                              </td>
-                            ))}
-                            {people.map((p, idx) => (
-                              <td key={`allergies-${idx}`} className="px-6 py-4 text-base">
-                                {isEditing ? (
-                                  <textarea
-                                    value={p.allergies || ''}
-                                    onChange={(e) => {
-                                      const newPeople = [...editingPeople];
-                                      newPeople[idx].allergies = e.target.value;
-                                      setEditingPeople(newPeople);
-                                    }}
-                                    className="w-full px-2 py-1 border rounded text-sm text-black"
-                                    placeholder="Allergie"
-                                    rows={1}
-                                  />
-                                ) : (
-                                  <div className="text-sm text-gray-600">{p.allergies || '-'}</div>
-                                )}
-                              </td>
-                            ))}
                             <td className="px-6 py-4 text-base">
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${booking.photo_auth ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                {booking.photo_auth ? 'Sì' : 'No'}
-                              </span>
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editingPerson?.name || ''}
+                                  onChange={(e) => setEditingPerson({ ...editingPerson, name: e.target.value })}
+                                  className="block w-full px-2 py-1 border rounded text-sm text-black"
+                                  placeholder="Nome"
+                                />
+                              ) : (
+                                <div className="text-sm text-gray-900">{booking.name}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-base">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editingPerson?.surname || ''}
+                                  onChange={(e) => setEditingPerson({ ...editingPerson, surname: e.target.value })}
+                                  className="block w-full px-2 py-1 border rounded text-sm text-black"
+                                  placeholder="Cognome"
+                                />
+                              ) : (
+                                <div className="text-sm text-gray-900">{booking.surname}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-base">
+                              {isEditing ? (
+                                <input
+                                  type="email"
+                                  value={editingPerson?.email || ''}
+                                  onChange={(e) => setEditingPerson({ ...editingPerson, email: e.target.value })}
+                                  className="w-full px-2 py-1 border rounded text-sm text-black"
+                                  placeholder="Email"
+                                />
+                              ) : (
+                                <div className="text-sm text-gray-600">{booking.email}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-base">
+                              {isEditing ? (
+                                <input
+                                  type="date"
+                                  value={editingPerson?.date_of_birth || ''}
+                                  onChange={(e) => setEditingPerson({ ...editingPerson, date_of_birth: e.target.value })}
+                                  className="w-full px-2 py-1 border rounded text-sm text-black"
+                                />
+                              ) : (
+                                <div className="text-sm text-gray-600">{formatDate(booking.date_of_birth)}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-base">
+                              {isEditing ? (
+                                <input
+                                  type="tel"
+                                  value={editingPerson?.phone || ''}
+                                  onChange={(e) => setEditingPerson({ ...editingPerson, phone: e.target.value })}
+                                  className="w-full px-2 py-1 border rounded text-sm text-black"
+                                  placeholder="Telefono"
+                                />
+                              ) : (
+                                <div className="text-sm text-gray-600">{booking.phone}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-base">
+                              {isEditing ? (
+                                <textarea
+                                  value={editingPerson?.allergies || ''}
+                                  onChange={(e) => setEditingPerson({ ...editingPerson, allergies: e.target.value })}
+                                  className="w-full px-2 py-1 border rounded text-sm text-black"
+                                  placeholder="Allergie"
+                                  rows={1}
+                                />
+                              ) : (
+                                <div className="text-sm text-gray-600">{booking.allergies || '-'}</div>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-base">
+                              {isEditing ? (
+                                <label className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={editingPerson?.photo_auth || false}
+                                    onChange={(e) => setEditingPerson({ ...editingPerson, photo_auth: e.target.checked })}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                                  />
+                                  <span className="ml-2 text-sm text-gray-600">Autorizzato</span>
+                                </label>
+                              ) : (
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${booking.photo_auth ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                  {booking.photo_auth ? 'Sì' : 'No'}
+                                </span>
+                              )}
                             </td>
                             <td className="px-6 py-4 text-base text-gray-600">
                               {formatDate(booking.created_at)}
@@ -1084,13 +1092,13 @@ export default function AdminDashboard() {
                               {isEditing ? (
                                 <>
                                   <button
-                                    onClick={() => handleSaveBooking(booking.id)}
+                                    onClick={() => handleSavePerson()}
                                     className="text-green-600 hover:text-green-800 font-semibold"
                                   >
                                     Salva
                                   </button>
                                   <button
-                                    onClick={() => setEditingBooking(null)}
+                                    onClick={() => setEditingPerson(null)}
                                     className="text-gray-600 hover:text-gray-800"
                                   >
                                     Annulla
@@ -1099,14 +1107,16 @@ export default function AdminDashboard() {
                               ) : (
                                 <>
                                   <button
-                                    onClick={() => handleEditBooking(booking)}
+                                    onClick={() => handleEditPerson(booking)}
                                     className="text-blue-600 hover:text-blue-800"
+                                    title="Modifica"
                                   >
                                     <i className="mdi mdi-pencil text-xl" />
                                   </button>
                                   <button
-                                    onClick={() => handleDeleteBooking(booking.id)}
+                                    onClick={() => handleDeletePerson(booking.id, booking.name, booking.surname)}
                                     className="text-red-600 hover:text-red-800"
+                                    title="Elimina"
                                   >
                                     <i className="mdi mdi-delete text-xl" />
                                   </button>

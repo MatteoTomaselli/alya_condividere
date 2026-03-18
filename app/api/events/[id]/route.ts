@@ -11,11 +11,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Evento non trovato' }, { status: 404 });
     }
 
-    const bookings = await allAsync('SELECT * FROM bookings WHERE event_id = ? AND status = ?', [eventId, 'confirmed']);
-    const totalBookedSeats = bookings.reduce((sum: number, booking: any) => {
-      const people = JSON.parse(booking.people);
-      return sum + people.length;
-    }, 0);
+    const bookings = await allAsync('SELECT COUNT(*) as count FROM bookings WHERE event_id = ? AND status = ?', [eventId, 'confirmed']);
+    const totalBookedSeats = bookings[0]?.count || 0;
 
     return NextResponse.json({
       ...event,

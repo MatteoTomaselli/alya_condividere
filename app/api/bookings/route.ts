@@ -4,7 +4,7 @@ import { runAsync, getAsync, allAsync } from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { event_id, people, photo_auth } = body;
+    const { event_id, people } = body;
 
     if (!event_id || !people || people.length === 0) {
       return NextResponse.json({ error: 'Dati mancanti' }, { status: 400 });
@@ -16,21 +16,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Evento non trovato' }, { status: 404 });
     }
 
-    const bookings = await allAsync('SELECT * FROM bookings WHERE event_id = ? AND status = ?', [event_id, 'confirmed']);
-    const totalBookedSeats = bookings.reduce((sum: number, booking: any) => {
-      const bookedPeople = JSON.parse(booking.people);
-      return sum + bookedPeople.length;
-    }, 0);
+    const bookings = await allAsync('SELECT COUNT(*) as count FROM bookings WHERE event_id = ? AND status = ?', [event_id, 'confirmed']);
+    const totalBookedSeats = bookings[0]?.count || 0;
 
     if (totalBookedSeats + people.length > event.max_capacity) {
       return NextResponse.json({ error: 'Non ci sono abbastanza posti disponibili' }, { status: 400 });
     }
 
-    // Crea la prenotazione
-    const result = await runAsync(
-      'INSERT INTO bookings (event_id, people, status, photo_auth) VALUES (?, ?, ?, ?)',
-      [event_id, JSON.stringify(people), 'confirmed', photo_auth || false]
-    );
+    // Crea un ID unico per il gruppo di prenotazione
+    const bookingGroupId = `group_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Inserisci una riga per ogni persona
+    for (const person of people) {
+      await runAsync(
+        'INSERT INTO bookings (event_id, name, surname, email, date_of_birth, phone, allergies, photo_auth, status, booking_group_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+          event_id,
+          person.name,
+          person.surname,
+          person.email,
+          person.dateOfBirth,
+          person.phone,
+          person.allergies || null,
+          person.photo_auth || false,
+          'confirmed',
+          bookingGroupId
+        ]
+      );
+    }
 
     // Invia email di conferma per ogni persona
     try {
@@ -79,7 +92,7 @@ export async function POST(request: NextRequest) {
       // Non fallire la prenotazione se l'email fallisce
     }
 
-    return NextResponse.json({ id: result.id, message: 'Prenotazione confermata' });
+    return NextResponse.json({ booking_group_id: bookingGroupId, message: 'Prenotazione confermata' });
   } catch (error: any) {
     console.error('Errore:', error);
     return NextResponse.json({ error: 'Errore nella prenotazione' }, { status: 500 });
