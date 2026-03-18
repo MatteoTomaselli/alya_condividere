@@ -29,23 +29,23 @@ export async function POST(request: NextRequest) {
         // Crea il corpo dell'email per l'admin
         const emailBody = `Nuova prenotazione per l'evento:
 
-📍 Evento: ${event.title}
-🗓 Data: ${formattedDate}
-⏰ Orario: ${event.time}
-📍 Luogo: ${event.location}
+Evento: ${event.title}
+Data: ${formattedDate}
+Orario: ${event.time}
+Luogo: ${event.location}
 
 Persone prenotate (${people.length}):
 ${peopleList}
 
+Ricavo evento: ${event.price} € x ${people.length} persone = ${parseInt(event.price) * people.length} €`;
 
-
-    // Invia l'email all'admin
-    await transporter.sendMail({
-      from: 'alya.condividere@gmail.com',
-      to: process.env.ADMIN_EMAIL || 'alya.condividere@gmail.com',
-      subject: `Nuova prenotazione - ${ event.title } `,
-      text: emailBody,
-    });
+        // Invia l'email all'admin
+        await transporter.sendMail({
+          from: 'alya.condividere@gmail.com',
+          to: process.env.ADMIN_EMAIL || 'alya.condividere@gmail.com',
+          subject: `Nuova prenotazione - ${event.title}`,
+          text: emailBody,
+        });
 
     return NextResponse.json({ success: true, message: 'Email admin inviata con successo' });
   } catch (error) {
