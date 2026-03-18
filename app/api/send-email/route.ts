@@ -20,27 +20,31 @@ export async function POST(request: NextRequest) {
 
     // Crea il corpo dell'email
     const emailBody = `Ciao,
+
 grazie per aver prenotato il nostro primo evento Alya – crea, condividi, vivi ✨
 
 Siamo felici di averti con noi all'attività creativa:
 
-🎨 Paint your Totebag con aperitivo
+🎨 Paint your ToteBag con aperitivo
 
-Durante il pomeriggio dipingerai la tua tote bag personalizzata che potrai portare a casa con te, il tutto in un momento di creatività, condivisione e relax.
+Ci vediamo per decorare la totebag e gustare insieme un aperitivo in cascina.
 
-📍 Dove: ${event.location}
+📍 Dove
+${event.location}
 
-🗓 Quando: ${formattedDate}
+🗓 Quando
+${formattedDate}
 
-⏰ Orario: ${event.time}
+⏰ Orario
+${event.time}
 
-💶 Costo: ${event.price} a persona (materiali e aperitivo inclusi)
-
+💶 Costo
+${event.price} € a persona (materiali e aperitivo inclusi)
 Il pagamento verrà effettuato all'arrivo. È possibile pagare in contanti, con carta o tramite Satispay.
 
 Dovrai portare solo la tua voglia di creare e di passare un bel pomeriggio insieme.
 
-Nel caso in cui non riuscissi più a partecipare, ti chiediamo di comunicarlo almeno 24 ore prima dell'evento, così da poter eventualmente liberare il posto per altre persone interessate.
+Nel caso in cui non riuscissi a partecipare, ti chiediamo di comunicarlo almeno 24 ore prima dell'evento, così da poter eventualmente liberare il posto per altre persone interessate.
 
 Se hai domande o necessità puoi rispondere direttamente a questa email.
 
@@ -48,7 +52,7 @@ Non vediamo l'ora di conoscerti 🌷
 
 A presto,
 
-Giorgia e Valeria di Alya`;
+Giorgia e Valera di Alya`;
 
     // Invia l'email
     await transporter.sendMail({

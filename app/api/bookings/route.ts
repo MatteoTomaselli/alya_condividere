@@ -52,6 +52,22 @@ export async function POST(request: NextRequest) {
           }),
         });
       }
+
+      // Invia email admin di notifica
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-email-admin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          people,
+          event: {
+            title: event.title,
+            date: event.date,
+            time: event.time,
+            location: event.location,
+            price: event.price,
+          },
+        }),
+      });
     } catch (emailError) {
       console.error('Errore nell\'invio dell\'email di conferma:', emailError);
       // Non fallire la prenotazione se l'email fallisce
