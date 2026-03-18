@@ -5,9 +5,7 @@ import { formatDate } from '@/lib/dateFormatter';
 export async function POST(request: NextRequest) {
     try {
         const { people, event } = await request.json();
-
-        // Formatta la data dell'evento
-        const formattedDate = formatDate(event.date);
+    console.log('send-email-admin ricevuta:', { people, event });
 
         // Configura il transporter di nodemailer
         const transporter = nodemailer.createTransport({
@@ -40,13 +38,14 @@ ${peopleList}
 Ricavo evento: ${event.price} € x ${people.length} persone = ${parseInt(event.price) * people.length} €`;
 
         // Invia l'email all'admin
-        await transporter.sendMail({
-          from: 'alya.condividere@gmail.com',
-          to: process.env.ADMIN_EMAIL || 'alya.condividere@gmail.com',
-          subject: `Nuova prenotazione - ${event.title}`,
-          text: emailBody,
-        });
-
+    console.log(`Invio email all'admin a: ${process.env.ADMIN_EMAIL}`);
+    const emailResult = await transporter.sendMail({
+      from: 'alya.condividere@gmail.com',
+      to: process.env.ADMIN_EMAIL || 'alya.condividere@gmail.com',
+      subject: `Nuova prenotazione - ${event.title}`,
+      text: emailBody,
+    });
+    console.log('Email admin inviata:', emailResult);
     return NextResponse.json({ success: true, message: 'Email admin inviata con successo' });
   } catch (error) {
     console.error('Errore nell\'invio email admin:', error);

@@ -191,12 +191,21 @@ export default function Events() {
                               
                               {/* Buttons */}
                               <div className="flex flex-col gap-3">
-                                <Link
-                                  href={`/events/${event.id}`}
-                                  className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-lg transition text-center"
-                                >
-                                  Prenota Ora
-                                </Link>
+                                {event.available_seats <= 0 ? (
+                                  <button
+                                    disabled
+                                    className="w-full bg-gray-400 text-white font-bold py-3 px-8 rounded-lg cursor-not-allowed text-center"
+                                  >
+                                    Sold Out
+                                  </button>
+                                ) : (
+                                  <Link
+                                    href={`/events/${event.id}`}
+                                    className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-lg transition text-center"
+                                  >
+                                    Prenota Ora
+                                  </Link>
+                                )}
                                 <Link
                                   href={`/events/${event.id}/gallery`}
                                   className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-lg transition text-center"

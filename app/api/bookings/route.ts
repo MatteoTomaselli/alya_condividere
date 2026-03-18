@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
     // Invia email di conferma per ogni persona
     try {
       for (const person of people) {
+        console.log(`Invio email a: ${person.email}`);
         await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -54,7 +55,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Invia email admin di notifica
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-email-admin`, {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      console.log(`Invio email admin a: ${process.env.ADMIN_EMAIL}, URL: ${appUrl}`);
+      const adminEmailResponse = await fetch(`${appUrl}/api/send-email-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,6 +71,9 @@ export async function POST(request: NextRequest) {
           },
         }),
       });
+      console.log(`Email admin response status: ${adminEmailResponse.status}`);
+      const adminEmailData = await adminEmailResponse.json();
+      console.log(`Email admin response: ${JSON.stringify(adminEmailData)}`);
     } catch (emailError) {
       console.error('Errore nell\'invio dell\'email di conferma:', emailError);
       // Non fallire la prenotazione se l'email fallisce
