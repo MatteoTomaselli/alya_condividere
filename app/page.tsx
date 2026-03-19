@@ -126,7 +126,7 @@ export default function Home() {
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Le nostre attività</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Creative Labs */}
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-pink-400">
+            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-pink-400 text-center">
               <h4 className="text-2xl font-bold text-black mb-4">🎨 Laboratori Creativi</h4>
               <p className="text-gray-700">
                 Spazi pensati per esprimere e stimolare la propria creatività e fantasia, attraverso diverse tecniche artistiche.
@@ -136,7 +136,7 @@ export default function Home() {
             </div>
 
             {/* Wellness Activities */}
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-purple-400">
+            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-purple-400 text-center">
               <h4 className="text-2xl font-bold text-black mb-4">🌸 Attività di Benessere</h4>
               <p className="text-gray-700">
                 Momenti che favoriscono il benessere personale in un ambiente tranquillo e rigenerante.
@@ -146,13 +146,13 @@ export default function Home() {
 
           {/* Community & Sharing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-green-400 hover:shadow-lg transition">
+            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-green-400 hover:shadow-lg transition text-center">
               <h4 className="text-2xl font-bold text-black mb-4">👥 Comunità Accogliente</h4>
               <p className="text-gray-700">
                 Incontri in piccoli gruppi per mantenere un'atmosfera intima.
               </p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-amber-400 hover:shadow-lg transition">
+            <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-amber-400 hover:shadow-lg transition text-center">
               <h4 className="text-2xl font-bold text-black mb-4">🤝 Condivisione Autentica</h4>
               <p className="text-gray-700">
                 Momenti di convivialità in un ambiente sicuro e inclusivo

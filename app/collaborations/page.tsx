@@ -106,7 +106,7 @@ export default function Collaborations() {
                         I nostri spazi
                     </h2>
 
-                    <p className="text-lg text-gray-700 mb-8">
+                    <p className="text-lg text-gray-700 mb-8 text-center">
                         <span className="breathing">Alya</span> collabora con realtà locali che condividono i nostri valori di creatività, 
                         inclusione e benessere. Scopri i nostri partner che rendono possibili i nostri eventi.
                     </p>

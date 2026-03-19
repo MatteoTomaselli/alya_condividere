@@ -28,7 +28,7 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-purple-900">
+    <div className="bg-white p-8 rounded-lg shadow-lg border-t-4 border-purple-900 text-center">
       <h4 className="text-2xl font-bold text-black mb-6">Cascina Argentera</h4>
 
       <div className="relative mb-6">
@@ -78,7 +78,7 @@ export default function CascinaGallery({ photos = [] }: CascinaGalleryProps) {
         ))}
       </div>
 
-      <p className="text-gray-700">
+      <p className="text-gray-700 text-center">
         Una location meravigliosa e accogliente perfetta per i nostri eventi e attività alle porte di Torino. Uno spazio dove la natura incontra la creatività, un'oasi di pace e ispirazione.
       </p>
     </div>

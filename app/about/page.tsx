@@ -107,14 +107,14 @@ export default function About() {
                         
                     </h2>
 
-                    <p className="text-lg text-gray-700 mb-8">
-                        <span className="breathing">Alya</span> è crescita: uno spazio in cui prendersi tempo per sé, creare e condividere momenti che fanno stare bene
+                    <p className="text-lg text-gray-700 mb-8 text-center">
+                        <span className="breathing">Alya</span> è crescita: uno spazio in cui prendersi tempo per sé, creare e condividere momenti che fanno stare bene.
                         I due fiori rappresentano l’incontro tra persone che crescono insieme, mentre il cerchio è condivisione, uno spazio dove siamo tutte allo stesso livello.
                     </p>
 
 
 
-                    <div className="bg-purple-50 border-l-4 border-purple-500 p-6 rounded">
+                    <div className="bg-purple-50 border-l-4 border-purple-500 p-6 rounded text-center">
                         <h3 className="text-2xl font-semibold text-purple-900 mb-6">Il nostro obiettivo</h3>
                         <ul className="space-y-4 text-gray-700">
                             <li className="flex items-start">
@@ -136,7 +136,7 @@ export default function About() {
                         </ul>
                     </div>
                     <br />
-                    <p className="text-lg text-purple-700 font-semibold mb-8">
+                    <p className="text-lg text-purple-700 font-semibold mb-8 text-center">
                         A cura di Giorgia e Valeria
                     </p>
                 </div>
