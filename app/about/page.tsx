@@ -114,7 +114,7 @@ export default function About() {
 
 
 
-                    <div className="bg-purple-50 border-l-4 border-purple-500 p-6 rounded text-center">
+                    <div className="bg-purple-50 border-l-4 border-purple-500 p-6 rounded">
                         <h3 className="text-2xl font-semibold text-purple-900 mb-6">Il nostro obiettivo</h3>
                         <ul className="space-y-4 text-gray-700">
                             <li className="flex items-start">
