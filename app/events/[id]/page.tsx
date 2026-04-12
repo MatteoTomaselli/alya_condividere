@@ -85,6 +85,11 @@ export default function EventDetail() {
       return;
     }
 
+    if (people.some(p => p.photo_auth === undefined || p.photo_auth === null)) {
+      setMessage('Devi scegliere se autorizzare le foto per ogni partecipante');
+      return;
+    }
+
     if (!eventId) {
       setMessage('Errore: evento non valido');
       return;
@@ -427,17 +432,35 @@ export default function EventDetail() {
                           />
                         </div>
                         <div className="mt-4">
-                          <label className="flex items-start">
-                            <input
-                              type="checkbox"
-                              checked={person.photo_auth || false}
-                              onChange={(e) => updatePerson(index, 'photo_auth', e.target.checked)}
-                              className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
-                            />
-                            <span className="ml-3 text-sm text-black">
-                              Autorizzo la realizzazione e l'utilizzo di foto e video durante gli eventi per finalità promozionali
-                            </span>
+                          <label className="block text-sm font-medium text-black mb-2">
+                            Autorizzo la realizzazione e l'utilizzo di foto e video durante gli eventi per finalità promozionali *
                           </label>
+                          <div className="flex gap-6">
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name={`photo_auth_${index}`}
+                                checked={person.photo_auth === true}
+                                onChange={() => updatePerson(index, 'photo_auth', true)}
+                                className="w-4 h-4 text-pink-600 border-gray-300 cursor-pointer"
+                              />
+                              <span className="ml-2 text-sm text-black">
+                                Si, autorizzo
+                              </span>
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name={`photo_auth_${index}`}
+                                checked={person.photo_auth === false}
+                                onChange={() => updatePerson(index, 'photo_auth', false)}
+                                className="w-4 h-4 text-pink-600 border-gray-300 cursor-pointer"
+                              />
+                              <span className="ml-2 text-sm text-black">
+                                No, non autorizzo
+                              </span>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     ))}

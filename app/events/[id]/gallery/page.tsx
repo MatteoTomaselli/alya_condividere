@@ -35,6 +35,7 @@ export default function EventGallery() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchEventAndPhotos = async () => {
@@ -68,6 +69,24 @@ export default function EventGallery() {
 
     fetchEventAndPhotos();
   }, [eventId]);
+
+  // Handle keyboard navigation for the photo modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedPhotoIndex === null) return;
+      
+      if (e.key === 'Escape') {
+        setSelectedPhotoIndex(null);
+      } else if (e.key === 'ArrowRight') {
+        setSelectedPhotoIndex((prev) => (prev! + 1) % photos.length);
+      } else if (e.key === 'ArrowLeft') {
+        setSelectedPhotoIndex((prev) => (prev! - 1 + photos.length) % photos.length);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPhotoIndex, photos.length]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
@@ -136,7 +155,14 @@ export default function EventGallery() {
 
   const handleDownloadPhoto = async (photo: Photo) => {
     try {
-      const response = await fetch(photo.url);
+      // Usa l'endpoint proxy per evitare problemi CORS
+      const encodedUrl = encodeURIComponent(photo.url);
+      const response = await fetch(`/api/photos/download?url=${encodedUrl}`);
+      
+      if (!response.ok) {
+        throw new Error('Errore nel download');
+      }
+      
       const blob = await response.blob();
       
       const url = window.URL.createObjectURL(blob);
@@ -336,9 +362,12 @@ export default function EventGallery() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {photos.map((photo) => (
+              {photos.map((photo, index) => (
                 <div key={photo.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-                  <div className="h-48 relative bg-gray-100 flex items-center justify-center">
+                  <div 
+                    className="h-48 relative bg-gray-100 flex items-center justify-center cursor-pointer hover:opacity-90 transition"
+                    onClick={() => setSelectedPhotoIndex(index)}
+                  >
                     <Image
                       src={photo.url}
                       alt="Foto evento"
@@ -370,6 +399,54 @@ export default function EventGallery() {
           )}
         </div>
       </main>
+
+      {/* Photo Modal */}
+      {selectedPhotoIndex !== null && (
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
+          onClick={() => setSelectedPhotoIndex(null)}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setSelectedPhotoIndex(null)}
+            className="absolute top-6 right-6 text-white hover:text-gray-300 text-4xl font-bold z-50"
+          >
+            ✕
+          </button>
+
+          <div 
+            className="relative w-full h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Main Image */}
+            <div className="relative w-full h-full flex items-center justify-center">
+              <Image
+                src={photos[selectedPhotoIndex].url}
+                alt="Foto ingrandita"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+
+            {/* Previous Button */}
+            <button
+              onClick={() => setSelectedPhotoIndex((prev) => (prev! - 1 + photos.length) % photos.length)}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition z-10"
+            >
+              <i className="mdi mdi-chevron-left text-3xl" />
+            </button>
+
+            {/* Next Button */}
+            <button
+              onClick={() => setSelectedPhotoIndex((prev) => (prev! + 1) % photos.length)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition z-10"
+            >
+              <i className="mdi mdi-chevron-right text-3xl" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white mt-16">
