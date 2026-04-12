@@ -415,11 +415,11 @@ export default function EventGallery() {
           </button>
 
           <div 
-            className="relative w-full h-full flex items-center justify-center"
+            className="relative w-full h-full flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Main Image */}
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative flex-1 w-full flex items-center justify-center">
               <Image
                 src={photos[selectedPhotoIndex].url}
                 alt="Foto ingrandita"
@@ -429,21 +429,36 @@ export default function EventGallery() {
               />
             </div>
 
-            {/* Previous Button */}
+            {/* Navigation Buttons - Desktop (on sides) */}
             <button
               onClick={() => setSelectedPhotoIndex((prev) => (prev! - 1 + photos.length) % photos.length)}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition z-10"
+              className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition z-10"
             >
               <i className="mdi mdi-chevron-left text-3xl" />
             </button>
 
-            {/* Next Button */}
             <button
               onClick={() => setSelectedPhotoIndex((prev) => (prev! + 1) % photos.length)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition z-10"
+              className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition z-10"
             >
               <i className="mdi mdi-chevron-right text-3xl" />
             </button>
+
+            {/* Navigation Buttons - Mobile (bottom) */}
+            <div className="md:hidden flex gap-4 justify-center pb-6">
+              <button
+                onClick={() => setSelectedPhotoIndex((prev) => (prev! - 1 + photos.length) % photos.length)}
+                className="bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition"
+              >
+                <i className="mdi mdi-chevron-left text-2xl" />
+              </button>
+              <button
+                onClick={() => setSelectedPhotoIndex((prev) => (prev! + 1) % photos.length)}
+                className="bg-white/20 hover:bg-white/40 text-white p-3 rounded-full transition"
+              >
+                <i className="mdi mdi-chevron-right text-2xl" />
+              </button>
+            </div>
           </div>
         </div>
       )}
