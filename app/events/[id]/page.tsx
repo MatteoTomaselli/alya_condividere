@@ -109,28 +109,6 @@ export default function EventDetail() {
       const data = await response.json();
       
       if (response.ok) {
-        // Invia email di conferma
-        try {
-          await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: people[0].email,
-              name: people[0].name,
-              surname: people[0].surname,
-              event: {
-                title: event?.title,
-                date: event?.date,
-                time: event?.time,
-                location: event?.location,
-                price: '22€'
-              }
-            })
-          });
-        } catch (emailError) {
-          console.error('Errore nell\'invio email:', emailError);
-        }
-        
         setMessage('Prenotazione confermata! Ti abbiamo inviato un\'email di conferma.');
         setPeople([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
         setPrivacyAccepted(false);
