@@ -21,15 +21,15 @@ export async function POST(request: NextRequest) {
     // Crea il corpo dell'email
     const emailBody = `Ciao,
 
-grazie per aver prenotato il nostro primo evento Alya – crea, condividi, vivi ✨
+grazie per aver prenotato il nostro evento Alya – crea, condividi, vivi ✨
 
-Siamo felici di averti con noi all'attività creativa:
+Siamo felici di averti con noi per:
 
-🎨 Paint your ToteBag con aperitivo
+🌿 Pilates class con aperitivo
 
-Ci vediamo per decorare la totebag e gustare insieme un aperitivo in cascina.
+Un momento dedicato al benessere, immerso nella natura, per muoversi, rilassarsi e condividere un’esperienza insieme.
 
-📍 Dove
+📍 Dove  
 ${event.location}
 
 🗓 Quando
@@ -39,26 +39,31 @@ ${formattedDate}
 ${event.time}
 
 💶 Costo
-${event.price} € a persona (materiali e aperitivo inclusi)
-Il pagamento verrà effettuato all'arrivo. È possibile pagare in contanti, con carta o tramite Satispay.
+${event.price} € a persona (lezione e aperitivo inclusi)
+La lezione sarà guidata da Lidia ed è adatta a tutti i livelli.
 
-Dovrai portare solo la tua voglia di creare e di passare un bel pomeriggio insieme.
+👉 Ti chiediamo di portare con te il tuo tappetino  
+👉 Ti consigliamo un abbigliamento comodo
 
-Nel caso in cui non riuscissi a partecipare, ti chiediamo di comunicarlo almeno 24 ore prima dell'evento, così da poter eventualmente liberare il posto per altre persone interessate.
+Il pagamento verrà effettuato direttamente all’arrivo.
 
-Se hai domande o necessità puoi rispondere direttamente a questa email.
+Ti chiediamo gentilmente di arrivare 5/10 minuti prima dell’inizio.
 
-Non vediamo l'ora di conoscerti 🌷
+Nel caso in cui non riuscissi più a partecipare, ti chiediamo di comunicarlo almeno 24 ore prima, così da poter eventualmente liberare il posto.
+
+Se hai domande puoi rispondere direttamente a questa email.
+
+Non vediamo l’ora di condividere questo momento insieme ✨
 
 A presto,
 
-Giorgia e Valera di Alya`;
+Alya – crea, condividi, vivi`;
 
     // Invia l'email
     await transporter.sendMail({
       from: 'alya.condividere@gmail.com',
       to: email,
-      subject: 'Conferma prenotazione - Paint your Totebag con aperitivo 🎨',
+      subject: 'Conferma prenotazione - Pilates class con aperitivo 🌿',
       text: emailBody,
     });
 

@@ -218,7 +218,7 @@ export async function allAsync(query: string, params: any[] = []) {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('date', { ascending: true });
+        .order('id', { ascending: false });
       
       if (error) throw error;
       return data || [];
@@ -245,7 +245,7 @@ export async function getEvents() {
   const { data, error } = await supabase
     .from('events')
     .select('*')
-    .order('date', { ascending: true });
+    .order('id', { ascending: false });
   
   if (error) throw error;
   return data || [];

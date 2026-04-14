@@ -3,7 +3,7 @@ import { allAsync, runAsync } from '@/lib/db';
 
 export async function GET() {
   try {
-    const events = await allAsync('SELECT * FROM events ORDER BY date ASC');
+    const events = await allAsync('SELECT * FROM events ORDER BY id DESC');
     
     // Calcola posti disponibili per ogni evento
     const eventsWithSeats = await Promise.all(events.map(async (event: any) => {
