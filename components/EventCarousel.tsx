@@ -72,7 +72,9 @@ export default function EventCarousel() {
             <div
               key={event.id}
               className={`absolute inset-0 transition-opacity duration-500 ${
-                index === currentIndex ? 'opacity-100' : 'opacity-0'
+                index === currentIndex
+                  ? 'opacity-100 pointer-events-auto z-10'
+                  : 'opacity-0 pointer-events-none z-0'
               }`}
             >
               <Link href={`/events/${event.id}`}>
