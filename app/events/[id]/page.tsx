@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { formatDate } from '@/lib/dateFormatter';
+import { LIABILITY_WAIVER_LABEL, LIABILITY_WAIVER_TEXT } from '@/lib/eventConsents';
 
 interface Person {
   name: string;
@@ -27,6 +28,7 @@ interface Event {
   price: string;
   image_url: string;
   available_seats: number;
+  requires_liability_waiver?: boolean;
 }
 
 export default function EventDetail() {
@@ -37,6 +39,7 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(true);
   const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [liabilityWaiverAccepted, setLiabilityWaiverAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
@@ -80,6 +83,11 @@ export default function EventDetail() {
       return;
     }
 
+    if (event?.requires_liability_waiver && !liabilityWaiverAccepted) {
+      setMessage('Devi accettare lo scarico di responsabilità');
+      return;
+    }
+
     if (people.some(p => !p.name || !p.surname || !p.email || !p.dateOfBirth || !p.phone)) {
       setMessage('Compila tutti i campi');
       return;
@@ -102,7 +110,8 @@ export default function EventDetail() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           event_id: parseInt(eventId as string),
-          people
+          people,
+          liability_waiver_accepted: liabilityWaiverAccepted
         })
       });
 
@@ -112,6 +121,7 @@ export default function EventDetail() {
         setMessage('Prenotazione confermata! Ti abbiamo inviato un\'email di conferma.');
         setPeople([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
         setPrivacyAccepted(false);
+        setLiabilityWaiverAccepted(false);
         // Ricarica l'evento per aggiornare i posti disponibili
         const eventResponse = await fetch(`/api/events/${eventId}`);
         const eventData = await eventResponse.json();
@@ -479,6 +489,24 @@ export default function EventDetail() {
                     </a>
                   </div>
 
+                  {event.requires_liability_waiver && (
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                      <div className="flex items-start">
+                        <input
+                          type="checkbox"
+                          id="liability-waiver"
+                          checked={liabilityWaiverAccepted}
+                          onChange={(e) => setLiabilityWaiverAccepted(e.target.checked)}
+                          className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
+                        />
+                        <label htmlFor="liability-waiver" className="ml-3 text-sm text-black">
+                          <span className="block font-medium mb-1">{LIABILITY_WAIVER_LABEL} *</span>
+                          <span>{LIABILITY_WAIVER_TEXT}</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Message */}
                   {message && (
                     <div className={`p-4 rounded-lg ${message.includes('confermata') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
@@ -489,7 +517,7 @@ export default function EventDetail() {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={submitting || !privacyAccepted}
+                    disabled={submitting || !privacyAccepted || (event.requires_liability_waiver && !liabilityWaiverAccepted)}
                     className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-black font-semibold py-3 px-4 rounded-lg transition"
                   >
                     {submitting ? 'Prenotazione in corso...' : 'Prenota Ora'}

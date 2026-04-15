@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/dateFormatter';
+import { LIABILITY_WAIVER_TEXT } from '@/lib/eventConsents';
 
 interface Person {
   name: string;
@@ -41,6 +42,7 @@ interface Event {
   max_capacity: number;
   price?: string;
   image_url?: string;
+  requires_liability_waiver?: boolean;
   booked_seats?: number;
   available_seats?: number;
 }
@@ -76,7 +78,8 @@ export default function AdminDashboard() {
     location: '',
     max_capacity: 20,
     price: '',
-    image_url: ''
+    image_url: '',
+    requires_liability_waiver: false
   });
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [uploadingEventImage, setUploadingEventImage] = useState(false);
@@ -234,7 +237,8 @@ export default function AdminDashboard() {
           location: '',
           max_capacity: 20,
           price: '',
-          image_url: ''
+          image_url: '',
+          requires_liability_waiver: false
         });
         setEventImagePreview('');
         fetchData();
@@ -350,7 +354,8 @@ export default function AdminDashboard() {
       location: event.location,
       max_capacity: event.max_capacity,
       price: event.price,
-      image_url: event.image_url
+      image_url: event.image_url,
+      requires_liability_waiver: event.requires_liability_waiver || false
     });
   };
 
@@ -724,6 +729,21 @@ export default function AdminDashboard() {
                     />
                   </div>
 
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={newEvent.requires_liability_waiver}
+                        onChange={(e) => setNewEvent({...newEvent, requires_liability_waiver: e.target.checked})}
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-pink-500"
+                      />
+                      <div>
+                        <p className="font-medium text-black">Richiedi scarico di responsabilità</p>
+                        <p className="mt-1 text-sm text-gray-700">{LIABILITY_WAIVER_TEXT}</p>
+                      </div>
+                    </label>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">Immagine Evento *</label>
                     <div className="flex gap-4 items-start">
@@ -770,7 +790,8 @@ export default function AdminDashboard() {
                           location: '',
                           max_capacity: 20,
                           price: '',
-                          image_url: ''
+                          image_url: '',
+                          requires_liability_waiver: false
                         });
                         setEventImagePreview('');
                       }}
@@ -905,6 +926,21 @@ export default function AdminDashboard() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-black"
                       rows={4}
                     />
+                  </div>
+
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={editingEventData.requires_liability_waiver || false}
+                        onChange={(e) => setEditingEventData({...editingEventData, requires_liability_waiver: e.target.checked})}
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-500"
+                      />
+                      <div>
+                        <p className="font-medium text-black">Richiedi scarico di responsabilità</p>
+                        <p className="mt-1 text-sm text-gray-700">{LIABILITY_WAIVER_TEXT}</p>
+                      </div>
+                    </label>
                   </div>
 
                   <div>

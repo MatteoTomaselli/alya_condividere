@@ -48,7 +48,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const eventId = parseInt(id);
     const body = await request.json();
 
-    const { title, description, date, time, location, max_capacity, price, image_url } = body;
+    const {
+      title,
+      description,
+      date,
+      time,
+      location,
+      max_capacity,
+      price,
+      image_url,
+      requires_liability_waiver,
+    } = body;
 
     console.log('PUT request received:', { eventId, body });
 
@@ -61,8 +71,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     console.log('Updating event with:', { title, date, time, location, maxCapInt, price });
 
     await runAsync(
-      'UPDATE events SET title = ?, description = ?, date = ?, time = ?, location = ?, max_capacity = ?, price = ?, image_url = ? WHERE id = ?',
-      [title, description || null, date, time, location, maxCapInt, price, image_url || null, eventId]
+      'UPDATE events SET title = ?, description = ?, date = ?, time = ?, location = ?, max_capacity = ?, price = ?, image_url = ?, requires_liability_waiver = ? WHERE id = ?',
+      [
+        title,
+        description || null,
+        date,
+        time,
+        location,
+        maxCapInt,
+        price,
+        image_url || null,
+        Boolean(requires_liability_waiver),
+        eventId,
+      ]
     );
 
     return NextResponse.json({ message: 'Evento aggiornato con successo' });

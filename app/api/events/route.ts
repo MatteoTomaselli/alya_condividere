@@ -35,15 +35,35 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, date, time, location, max_capacity, price, image_url } = body;
+    const {
+      title,
+      description,
+      date,
+      time,
+      location,
+      max_capacity,
+      price,
+      image_url,
+      requires_liability_waiver,
+    } = body;
 
     if (!title || !date || !time || !location || !price) {
       return NextResponse.json({ error: 'Campi obbligatori mancanti' }, { status: 400 });
     }
 
     const result = await runAsync(
-      'INSERT INTO events (title, description, date, time, location, max_capacity, price, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [title, description || '', date, time, location, max_capacity || 20, price, image_url || '']
+      'INSERT INTO events (title, description, date, time, location, max_capacity, price, image_url, requires_liability_waiver) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [
+        title,
+        description || '',
+        date,
+        time,
+        location,
+        max_capacity || 20,
+        price,
+        image_url || '',
+        Boolean(requires_liability_waiver),
+      ]
     );
 
     return NextResponse.json({ id: result.id, message: 'Evento creato con successo' });

@@ -4,7 +4,7 @@ import { runAsync, getAsync, allAsync } from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { event_id, people } = body;
+    const { event_id, people, liability_waiver_accepted } = body;
 
     if (!event_id || !people || people.length === 0) {
       return NextResponse.json({ error: 'Dati mancanti' }, { status: 400 });
@@ -14,6 +14,10 @@ export async function POST(request: NextRequest) {
     const event = await getAsync('SELECT * FROM events WHERE id = ?', [event_id]);
     if (!event) {
       return NextResponse.json({ error: 'Evento non trovato' }, { status: 404 });
+    }
+
+    if (event.requires_liability_waiver && !liability_waiver_accepted) {
+      return NextResponse.json({ error: 'Devi accettare lo scarico di responsabilità' }, { status: 400 });
     }
 
     const bookings = await allAsync('SELECT COUNT(*) as count FROM bookings WHERE event_id = ? AND status = ?', [event_id, 'confirmed']);

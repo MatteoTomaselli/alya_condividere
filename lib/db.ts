@@ -44,7 +44,8 @@ export async function runAsync(query: string, params: any[] = []) {
           location: params[4],
           max_capacity: params[5],
           price: params[6],
-          image_url: params[7]
+          image_url: params[7],
+          requires_liability_waiver: params[8] || false
         })
         .select()
         .single();
@@ -124,7 +125,8 @@ export async function runAsync(query: string, params: any[] = []) {
           location: params[4],
           max_capacity: params[5],
           price: params[6],
-          image_url: params[7]
+          image_url: params[7],
+          requires_liability_waiver: params[8] || false
         })
         .eq('id', eventId)
         .select()
