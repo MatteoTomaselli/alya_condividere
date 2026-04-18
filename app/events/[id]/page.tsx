@@ -39,6 +39,7 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(true);
   const [people, setPeople] = useState<Person[]>([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [womenOnlyAcknowledged, setWomenOnlyAcknowledged] = useState(false);
   const [liabilityWaiverAccepted, setLiabilityWaiverAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -83,6 +84,11 @@ export default function EventDetail() {
       return;
     }
 
+    if (!womenOnlyAcknowledged) {
+      setMessage("Devi dichiarare di aver letto che l'evento è dedicato a donnne e ragazze");
+      return;
+    }
+
     if (event?.requires_liability_waiver && !liabilityWaiverAccepted) {
       setMessage('Devi accettare lo scarico di responsabilità');
       return;
@@ -121,6 +127,7 @@ export default function EventDetail() {
         setMessage('Prenotazione confermata! Ti abbiamo inviato un\'email di conferma.');
         setPeople([{ name: '', surname: '', email: '', dateOfBirth: '', phone: '', allergies: '' }]);
         setPrivacyAccepted(false);
+        setWomenOnlyAcknowledged(false);
         setLiabilityWaiverAccepted(false);
         // Ricarica l'evento per aggiornare i posti disponibili
         const eventResponse = await fetch(`/api/events/${eventId}`);
@@ -478,6 +485,19 @@ export default function EventDetail() {
                     </label>
                   </div>
 
+                  <div className="flex items-start">
+                    <input
+                      type="checkbox"
+                      id="women-only-acknowledged"
+                      checked={womenOnlyAcknowledged}
+                      onChange={(e) => setWomenOnlyAcknowledged(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-pink-600 border-gray-300 rounded cursor-pointer"
+                    />
+                    <label htmlFor="women-only-acknowledged" className="ml-3 text-sm text-black">
+                      Dichiaro di aver letto che l&apos;evento è dedicato a donnne e ragazze *
+                    </label>
+                  </div>
+
                   <div className="text-sm">
                     <a
                       href="/Privacy.pdf"
@@ -517,7 +537,7 @@ export default function EventDetail() {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={submitting || !privacyAccepted || (event.requires_liability_waiver && !liabilityWaiverAccepted)}
+                    disabled={submitting || !privacyAccepted || !womenOnlyAcknowledged || (event.requires_liability_waiver && !liabilityWaiverAccepted)}
                     className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 text-black font-semibold py-3 px-4 rounded-lg transition"
                   >
                     {submitting ? 'Prenotazione in corso...' : 'Prenota Ora'}
